@@ -1,3 +1,40 @@
+"""
+Main FastPAI application for the Local AI Router.
+
+This module defines the HTTP-facing service.
+
+Current API endpoints:
+
+    GET /health
+        Confirms that the router is running and that Ollama is reachable.
+
+    GET /models
+        Returns the model inventory reported by Ollama
+    
+    POST /route
+        Runs routing policy only.
+        No AI inference occurs.
+
+    POST /chat
+        Routes a user request and sends it to Ollama for inference.
+
+The Application deliberatly keps routing policy and Ollama communication in seperate modules:
+
+    main.py
+        HTTP/API orchestration
+    
+    routing.py
+        Routing decisions
+    
+    ollama_client.py
+        Communication with Ollama
+
+    schemas.py
+        API data validation
+
+This seperation will make it much easier to add additional models, infernce engines,
+memory, tools, and project-specific routing later.
+"""
 from contextlib import asynccontextmanager
 
 import httpx
@@ -5,7 +42,12 @@ from fastapi import FastAPI, HTTPException, Request
 
 from .config import DEFAULT_MODEL
 from .ollama_client import OllamaClient
-from .schemas import ChatRequest, ChatResponse
+from .routing import choose_route
+from .schemas import (
+    ChatRequest, 
+    ChatResponse,
+    RouteRequest,
+    RouteResponse)
 
 
 @asynccontextmanager
