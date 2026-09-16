@@ -48,16 +48,16 @@ class RouteResponse(BaseModel):
     Response returned by the /route endpoint.
 
     attributes:
-        route (Literal["fast", "reasoning"]):
+        route_mode (Literal["fast", "reasoning"]):
             The route that the router has chosen to handle the request.
         thinking_enabled (bool):
             True if the chosen route will run the AI model with thinking/reasoning mode enabled.
-        routing_reason (str):
+        route_reason (str):
             Human-readable explanation of routing decision.
     """
-    route: Literal["fast", "reasoning"]
+    route_mode: Literal["fast", "reasoning"]
     thinking_enabled: bool
-    routing_reason: str
+    route_reason: str
 
 class ChatRequest(BaseModel):
     """
@@ -103,7 +103,7 @@ class ChatResponse(BaseModel):
         thinking_enabled (bool):
             Whether thinking/reasoning mode was enabled for the inference request.
         
-        routing_reason (str): 
+        route_reason (str): 
             Explanation of why the router selected this route.
         
         response (str):
@@ -124,7 +124,7 @@ class ChatResponse(BaseModel):
     model_name: str
     route_mode: Literal["fast", "reasoning"]    
     thinking_enabled: bool
-    routing_reason: str
+    route_reason: str
     response: str
     total_duration_ns: int | None = None 
     eval_count: int | None = None

@@ -31,7 +31,7 @@ class OllamaClient:
     async def chat(
         self,
         model: str,
-        message: str,
+        user_message: str,
         think: bool,
     ) -> dict[str, Any]:
         response = await self._client.post(
@@ -41,7 +41,7 @@ class OllamaClient:
                 "messages": [
                     {
                         "role": "user",
-                        "content": message,
+                        "content": user_message,
                     }
                 ],
                 "think": think,

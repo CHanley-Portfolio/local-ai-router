@@ -14,7 +14,7 @@ At this stage of the project, there are two actual routes:
         Quen runs with thinking/reasoning mode enabled.
 
 The public API also supports an "auto" mode. "auto" is not itself a route.
-Instead, it tells the router to inspect the user's message and choose either "fast" or "reasoning".
+Instead, it tells the router to inspect the user's user_message and choose either "fast" or "reasoning".
 
 This first implementation deliberately uses transparent rule-based routing.
 That makes the decision process:
@@ -44,7 +44,7 @@ from typing import Literal
 #
 # This improves readability and allows editors/type checkers to catch accidental values such a as "quick" or "reason".
 #
-RouteName = Literal["fast", "reasoning"]
+RouteMode = Literal["fast", "reasoning"]
 
 # RequestMode represents the values a client is allowed to request.
 #
@@ -63,18 +63,18 @@ class RoutingDecision:
             Current Values:
                 - "fast": for ordinary questions and lightweight tasks.
                 - "reasoning": for tasks that appear to require deeper analysis.
-        think (bool): Whether the selected route should run in thinking/reasoning mode.
+        thinking_enabled (bool): Whether the selected route should run in thinking/reasoning mode.
             Current Values:
                 - True: thinking/reasoning mode enabled.
                 - False: thinking/reasoning mode disabled.
-        reason (str): A human-readable explanation of why this route was chosen.
+        route_reason (str): A human-readable explanation of why this route was chosen.
             This is deliberatly included so that routing decisions are inspectable rather than behaving as a black box.
 
     The dataclass is marked frozen=True so a routing decision cannot be accidentaly modified after it has been created.
     """
-    route_name: RouteName
-    think: bool
-    reason: str
+    route_mode: RouteMode
+    thinking_enabled: bool
+    route_reason: str
 
 #-----------------------------------------------------------------------------------------------
 # Automatic-routing indicators
@@ -107,26 +107,26 @@ REASONING_MARKERS = (
     "troubleshoot",
 )
 
-def choose_route(user_message: str, requested_mode: RequestMode) -> RoutingDecision:
+def choose_route(user_message: str, route_mode: RequestMode) -> RoutingDecision:
     """
     Decide which route should handle a user request.
 
     Args:
         user_message (str): The text of the user's request.
-        requested_mode (RequestMode): The mode requested by the client.
-            - "auto": router decides based on the content of the message.
+        route_mode (RequestMode): The mode requested by the client.
+            - "auto": router decides based on the content of the user_message.
             - "fast": force the fast route.
             - "reasoning": force the reasoning route.
 
     Returns:
         RoutingDecision: The result of evaluating the request and deciding which route should handle it.
             -route_name (RouteName): "fast" or "reasoning"
-            -think (bool): Boolean passed to the model backend.
-            -reason (str): Explanation of why the route was selected.
+            -thinking_enabled (bool): Boolean passed to the model backend.
+            -route_reason (str): Explanation of why the route was selected.
 
      Routing algorithm:
         1. Respect explicit "fast" or "reasoning" requests immediately.
-        2. For "auto", normalize the message to lowercase.
+        2. For "auto", normalize the user_message to lowercase.
         3. Search for known reasoning-related words/phrases.
         4. Add small scores for unusually long prompts.
         5. Route to reasoning if the resulting score reaches the threshold.
@@ -143,21 +143,21 @@ def choose_route(user_message: str, requested_mode: RequestMode) -> RoutingDecis
     #
     # This allows applictions or users to override the router when they 
     # already know which behavior they want.
-    if requested_mode == "fast":
+    if route_mode == "fast":
         return RoutingDecision(
-            route_name="fast",
-            think=False,
-            reason="Fast mode explicitly requested.",
+            route_mode="fast",
+            thinking_enabled=False,
+            route_reason="Fast mode explicitly requested.",
         )
 
-    if requested_mode == "reasoning":
+    if route_mode == "reasoning":
         return RoutingDecision(
-            route_name="reasoning",
-            think=True,
-            reason="Reasoning mode explicitly requested.",
+            route_mode="reasoning",
+            thinking_enabled=True,
+            route_reason="Reasoning mode explicitly requested.",
         )
 
-    # Convert the incomoing message to lowercase so marker comparisons are case-sensitive.
+    # Convert the incomoing user_message to lowercase so marker comparisons are case-sensitive.
     #
     # For example:
     #   "Analyze this" -> "analyze this"
@@ -183,14 +183,14 @@ def choose_route(user_message: str, requested_mode: RequestMode) -> RoutingDecis
     # Count whitespace-seperated words.
     #
     # Prompt length alone is only weak evidence o difficulty, so a long
-    # message contributes one additional point.
+    # user_message contributes one additional point.
     word_count = len(normalized_message.split())
     if word_count >= 150:
         score += 1
 
     # Character Length gives us another simple measure of a large prompt.
     #
-    # Again, this contributes only one point because a long message can be
+    # Again, this contributes only one point because a long user_message can be
     #simple--for example, a request summarizing a long document.
     if len(normalized_message) >= 800:
         score += 1
@@ -210,16 +210,16 @@ def choose_route(user_message: str, requested_mode: RequestMode) -> RoutingDecis
             reason += f" Matched markers: {marker_text}."
 
         return RoutingDecision(
-            route_name="reasoning",
-            think=True,
-            reason=reason,
+            route_mode="reasoning",
+            thinking_enabled=True,
+            route_reason=reason,
         )
 
     # If none of the criteria crossed our threshold, use normal fast inference.
     #This is delberately the default because thinking mode is far more expensive for routine queries
     #based on our benchamarks.
     return RoutingDecision(
-        route_name="fast",
-        think=False,
-        reason="Automatic routing did not detect a reasoning-heavy request.",
+        route_mode="fast",
+        thinking_enabled=False,
+        route_reason="Automatic routing did not detect a reasoning-heavy request.",
     )
