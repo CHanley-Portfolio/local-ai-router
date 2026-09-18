@@ -257,13 +257,13 @@ async def chat(
     # Use an explicitly requested model when supplied
     #
     # Otherwise fall back to the systems configured default model.
-    model = payload.model or DEFAULT_MODEL
+    model_name = payload.model_name or DEFAULT_MODEL
 
     # Decide whether this request should use normal fast inference
     # or reasoning/thinking behavior
     decision = choose_route(
         user_message=payload.user_message,
-        thinking_enabled=payload.thinking_enabled,
+        route_mode=payload.route_mode,
     )
 
     try:
@@ -272,9 +272,9 @@ async def chat(
         # The API caller does not need to understand Ollama's "thinking_enabled"
         # implementation. Our router derives it from the logical route.
         result = await request.app.state.ollama.chat(
-            model_name=payload.model_name,
+            model=model_name,
             user_message=payload.user_message,
-            thinking_enabled=payload.thinking_enabled,
+            think=decision.thinking_enabled,
         )
 
     except httpx.HTTPError as exc:
@@ -288,8 +288,11 @@ async def chat(
     # This abstraction means applications can continue using our API 
     # even if we replace or add another inference backend later.
     return ChatResponse(
-        model_name=result.get("model", model),
-        response=result["user_message"]["content"],
+        model_name=result.get("model", model_name),
+        route_mode=decision.route_mode,
+        thinking_enabled=decision.thinking_enabled,
+        route_reason=decision.route_reason,
+        response=result["message"]["content"],
         total_duration_ns=result.get("total_duration"),
         eval_count=result.get("eval_count"),
         eval_duration_ns=result.get("eval_duration"),
