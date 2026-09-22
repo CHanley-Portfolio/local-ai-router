@@ -1,7 +1,7 @@
 """
 Routing policy for the Local AI Router.
 
-this module contains the logic that decides which interface mode should handle and incoming user request.
+this module contains the logic that decides which interface mode should handle an incoming user request.
 
 At this stage of the project, there are two actual routes:
 
@@ -37,7 +37,7 @@ from typing import Literal
 #
 # Literal restricts these string values to a known set of valid choices.
 #
-# For example, RouteName should only ever contain:
+# For example, RouteMode should only ever contain:
 #
 #   - "fast"
 #   - "reasoning"
@@ -59,7 +59,7 @@ class RoutingDecision:
     Represents the result of evaluating a user request and deciding which route should handle it.
 
     Attributes:
-        route_name (RouteName): Tthe logical route selected by the router.
+        route_mode (RouteMode): Tthe logical route selected by the router.
             Current Values:
                 - "fast": for ordinary questions and lightweight tasks.
                 - "reasoning": for tasks that appear to require deeper analysis.
@@ -120,7 +120,7 @@ def choose_route(user_message: str, route_mode: RequestMode) -> RoutingDecision:
 
     Returns:
         RoutingDecision: The result of evaluating the request and deciding which route should handle it.
-            -route_name (RouteName): "fast" or "reasoning"
+            -route_mode (RouteMode): "fast" or "reasoning"
             -thinking_enabled (bool): Boolean passed to the model backend.
             -route_reason (str): Explanation of why the route was selected.
 

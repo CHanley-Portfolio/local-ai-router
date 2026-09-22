@@ -249,7 +249,7 @@ async def chat(
     Processing sequence:
         1. Resolve which model should be used.
         2. Ask routing policy whether fast or reasoning is appropriate.
-        3. Translate that decision into Ollama's thinking_mode Boolean.
+        3. Translate that decision into Ollama's "think" Boolean.
         4. Send Request to Ollama. 
         5. Return the answer plus routing/performance information.
     """
