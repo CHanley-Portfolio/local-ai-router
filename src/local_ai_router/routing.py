@@ -5,11 +5,11 @@ this module contains the logic that decides which interface mode should handle a
 
 At this stage of the project, there are two actual routes:
 
-    Fast: 
+    Fast:
         Intended for ordinary questions and lightweight tasks.
         Qwen runs with its thinking/reasoning mode disabled.
-    
-    Reasoning: 
+
+    Reasoning:
         Intended for tasks that appear to require deeper analysis.
         Quen runs with thinking/reasoning mode enabled.
 
@@ -21,7 +21,7 @@ That makes the decision process:
     - fast,
     - deterministic,
     - easy to test,
-    - easy to understand, 
+    - easy to understand,
     - and easy to improve later.
 
 Future versions may use additional signals such as model availability, hardware load, token count, project context, task classification models,
@@ -31,9 +31,9 @@ or evaluation data.
 from dataclasses import dataclass
 from typing import Literal
 
-#-----------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------
 # Type aliases
-#-----------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------
 #
 # Literal restricts these string values to a known set of valid choices.
 #
@@ -52,6 +52,7 @@ RouteMode = Literal["fast", "reasoning"]
 # "fast" and "reasoning" force a particular route.
 #
 RequestMode = Literal["auto", "fast", "reasoning"]
+
 
 @dataclass(frozen=True)
 class RoutingDecision:
@@ -72,21 +73,23 @@ class RoutingDecision:
 
     The dataclass is marked frozen=True so a routing decision cannot be accidentaly modified after it has been created.
     """
+
     route_mode: RouteMode
     thinking_enabled: bool
     route_reason: str
 
-#-----------------------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------------------------
 # Automatic-routing indicators
-#-----------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------
 #
-# These words and phrases are currently traeted as strong indicators that 
+# These words and phrases are currently traeted as strong indicators that
 # a task may benefit from deeper reasoning.
 #
 # Each match contributes points to a simple routing score inside
 # choose_route().
 #
-# This is intentionally a conservative starting list. We will update it 
+# This is intentionally a conservative starting list. We will update it
 # using real project workloads rather than trying to predict every possible request in advance,
 #
 REASONING_MARKERS = (
@@ -106,6 +109,7 @@ REASONING_MARKERS = (
     "tradeoffs",
     "troubleshoot",
 )
+
 
 def choose_route(user_message: str, route_mode: RequestMode) -> RoutingDecision:
     """
@@ -131,7 +135,7 @@ def choose_route(user_message: str, route_mode: RequestMode) -> RoutingDecision:
         4. Add small scores for unusually long prompts.
         5. Route to reasoning if the resulting score reaches the threshold.
         6. Otherwise use the fast route.
-    
+
     Important:
         This function does not call an AI model.
 
@@ -139,9 +143,9 @@ def choose_route(user_message: str, route_mode: RequestMode) -> RoutingDecision:
         completely inspectable during this early stage of the project.
     """
 
-    #Explicit modes always take priority over automatic classification.
+    # Explicit modes always take priority over automatic classification.
     #
-    # This allows applictions or users to override the router when they 
+    # This allows applictions or users to override the router when they
     # already know which behavior they want.
     if route_mode == "fast":
         return RoutingDecision(
@@ -173,7 +177,7 @@ def choose_route(user_message: str, route_mode: RequestMode) -> RoutingDecision:
 
     # Search the request for each known reasoning indicator.
     #
-    # Each marker is worth two points. Because the current threshold is 
+    # Each marker is worth two points. Because the current threshold is
     # also two points, one strong marker is enough to select reasoning mode.
     for marker in REASONING_MARKERS:
         if marker in normalized_message:
@@ -191,7 +195,7 @@ def choose_route(user_message: str, route_mode: RequestMode) -> RoutingDecision:
     # Character Length gives us another simple measure of a large prompt.
     #
     # Again, this contributes only one point because a long user_message can be
-    #simple--for example, a request summarizing a long document.
+    # simple--for example, a request summarizing a long document.
     if len(normalized_message) >= 800:
         score += 1
 
@@ -216,8 +220,8 @@ def choose_route(user_message: str, route_mode: RequestMode) -> RoutingDecision:
         )
 
     # If none of the criteria crossed our threshold, use normal fast inference.
-    #This is delberately the default because thinking mode is far more expensive for routine queries
-    #based on our benchamarks.
+    # This is delberately the default because thinking mode is far more expensive for routine queries
+    # based on our benchamarks.
     return RoutingDecision(
         route_mode="fast",
         thinking_enabled=False,

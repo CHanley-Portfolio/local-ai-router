@@ -10,7 +10,7 @@ Current API endpoints:
 
     GET /models
         Returns the model inventory reported by Ollama
-    
+
     POST /route
         Runs routing policy only.
         No AI inference occurs.
@@ -22,10 +22,10 @@ The Application deliberatly keps routing policy and Ollama communication in sepe
 
     main.py
         HTTP/API orchestration
-    
+
     routing.py
         Routing decisions
-    
+
     ollama_client.py
         Communication with Ollama
 
@@ -35,6 +35,7 @@ The Application deliberatly keps routing policy and Ollama communication in sepe
 This seperation will make it much easier to add additional models, infernce engines,
 memory, tools, and project-specific routing later.
 """
+
 from contextlib import asynccontextmanager
 
 import httpx
@@ -43,11 +44,7 @@ from fastapi import FastAPI, HTTPException, Request
 from .config import DEFAULT_MODEL
 from .ollama_client import OllamaClient
 from .routing import choose_route
-from .schemas import (
-    ChatRequest, 
-    ChatResponse,
-    RouteRequest,
-    RouteResponse)
+from .schemas import ChatRequest, ChatResponse, RouteRequest, RouteResponse
 
 
 @asynccontextmanager
@@ -58,12 +55,12 @@ async def lifespan(app: FastAPI):
     Parameters:
         app:
             The FastAPI application instnace currently starting or stopping.
-    
+
     Startup behavior:
         Creates one OllamaClient and stores it in:
 
             app.state.ollama
-        
+
         All API requests reuse this client and its HTTP connection pool.
 
     Shutdown behaivor:
@@ -89,6 +86,7 @@ async def lifespan(app: FastAPI):
 
     # Gracefully release the HTTP connections maintained by HTTPX.
     await app.state.ollama.close()
+
 
 # Create the FastAPI appplication object used by uvicorn.
 #
@@ -124,8 +122,8 @@ async def health(request: Request):
     Raises:
         HTTPException 503:
             Returned if Ollama cannot be reached.
-    
-    A successful responce means not only that FastAPI is running, 
+
+    A successful responce means not only that FastAPI is running,
     but also that the ruter can communicate with its current inference backend.
     """
 
@@ -165,20 +163,21 @@ async def models(request: Request):
     Raises:
         HTTPException 503:
             Returned when Ollama cannot supply the model inventory.
-    
-    **This endpoint currently exposes Ollama's raw model information. 
+
+    **This endpoint currently exposes Ollama's raw model information.
     A later version will likely provide a router-specific model registy
     instead of exposing backend details directly to applications.**
     """
 
     try:
         return await request.app.state.ollama.models()
-    
+
     except httpx.HTTPError as exc:
         raise HTTPException(
             status_code=503,
             detail="Unable to retrieve Ollama models.",
         ) from exc
+
 
 @app.post("/route", response_model=RouteResponse)
 async def route(payload: RouteRequest):
@@ -192,19 +191,19 @@ async def route(payload: RouteRequest):
                     Text to classify.
                 route_mode:
                     auto, fast, or reasoning.
-    
+
     Returns
         RouteResponse:
             Selected route, thinking setting, and explanation.
-    
+
             This endpoint is intentionally seperate from /chat.
 
             It allows us to test routing logic quickly without:
                 - loading a model,
                 - consuming gpu time,
-                - genereating tokens, 
+                - genereating tokens,
                 - or waiting for an AI response.
-        
+
     It will also become useful for automated routing evaluations.
     """
 
@@ -220,6 +219,7 @@ async def route(payload: RouteRequest):
         route_reason=decision.route_reason,
     )
 
+
 @app.post("/chat", response_model=ChatResponse)
 async def chat(
     payload: ChatRequest,
@@ -232,7 +232,7 @@ async def chat(
         payload:
             Validated CHatRequest containing the user's prompt,
             optional model override, and te requested routing mode
-        
+
         request:
             FastAPI request object used to access the shared OllamaClient.
 
@@ -250,7 +250,7 @@ async def chat(
         1. Resolve which model should be used.
         2. Ask routing policy whether fast or reasoning is appropriate.
         3. Translate that decision into Ollama's "think" Boolean.
-        4. Send Request to Ollama. 
+        4. Send Request to Ollama.
         5. Return the answer plus routing/performance information.
     """
 
@@ -285,7 +285,7 @@ async def chat(
 
     # COnvert Ollama's backend-specific response into our own stable router response schema
     #
-    # This abstraction means applications can continue using our API 
+    # This abstraction means applications can continue using our API
     # even if we replace or add another inference backend later.
     return ChatResponse(
         model_name=result.get("model", model_name),

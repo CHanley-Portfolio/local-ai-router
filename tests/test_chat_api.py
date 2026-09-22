@@ -3,7 +3,7 @@ Integration tests for the Local AI Router /chat API endpoint
 
 These tests verify the complete application path between:
 
-    
+
     HTTP request
         ↓
     ChatRequest validation
@@ -37,6 +37,7 @@ from local_ai_router.config import DEFAULT_MODEL
 from local_ai_router.main import app
 from local_ai_router.ollama_client import OllamaClient
 
+
 @pytest.fixture
 def chat_test_client():
     """
@@ -45,7 +46,7 @@ def chat_test_client():
     The Local AI Router normally creates its OllamaClient inside the application's lifespan handler:
 
         app.state.ollama = OllamaClient()
-    
+
     For these tests, we replace that constructor with a mock before FastAPI starts.
 
     This allows the application itself to run normally while preventing any real network requests from being sent to Ollama.
@@ -70,7 +71,7 @@ def chat_test_client():
     # the FastAPI lifespan function actually looks it up
     with patch(
         "local_ai_router.main.OllamaClient",
-        return_value = mocked_ollama_client,
+        return_value=mocked_ollama_client,
     ):
         # Entering TestCLient starts FastAPI's lifespan handler.
         #
@@ -78,6 +79,7 @@ def chat_test_client():
         # our mocked lient rather than a real Ollama connection
         with TestClient(app) as test_client:
             yield test_client, mocked_ollama_client
+
 
 def test_chat_fast_route_uses_non_thinking_inference(chat_test_client) -> None:
     """
@@ -143,6 +145,7 @@ def test_chat_fast_route_uses_non_thinking_inference(chat_test_client) -> None:
         think=False,
     )
 
+
 def test_chat_reasoning_route_enables_thinking_inference(chat_test_client) -> None:
     """
     Verify that explicit reasoning mode enables Ollama thinking mode.
@@ -157,19 +160,12 @@ def test_chat_reasoning_route_enables_thinking_inference(chat_test_client) -> No
 
     mocked_ollama_client.chat.return_value = {
         "model": model_name,
-        "message": {
-            "role": "assistant",
-            "content": "Here is the architectural analysis"
-        },
+        "message": {"role": "assistant", "content": "Here is the architectural analysis"},
     }
 
     response = test_client.post(
         "/chat",
-        json={
-            "user_message": user_message,
-            "model_name": model_name,
-            "route_mode": "reasoning"
-        },
+        json={"user_message": user_message, "model_name": model_name, "route_mode": "reasoning"},
     )
 
     assert response.status_code == 200
@@ -185,6 +181,7 @@ def test_chat_reasoning_route_enables_thinking_inference(chat_test_client) -> No
         user_message=user_message,
         think=True,
     )
+
 
 def test_chat_uses_default_model_when_model_name_not_specified(chat_test_client) -> None:
     """
@@ -202,7 +199,7 @@ def test_chat_uses_default_model_when_model_name_not_specified(chat_test_client)
         "model": DEFAULT_MODEL,
         "message": {
             "role": "assistant",
-            "content": "CUDA stands for Compute Unified Device Architecture."
+            "content": "CUDA stands for Compute Unified Device Architecture.",
         },
     }
 
@@ -223,12 +220,13 @@ def test_chat_uses_default_model_when_model_name_not_specified(chat_test_client)
         think=False,
     )
 
+
 def test_chat_returns_503_when_ollama_request_fails(chat_test_client) -> None:
     """
     Verify that backend communication failures becaome HTTP 503 responses.
 
     Ollama is a required downstream service. If it cannot be reached,
-    the router should report Service Unavailable rather than exposing an 
+    the router should report Service Unavailable rather than exposing an
     internal HTTPX exception to the API caller.
     """
 
@@ -257,3 +255,56 @@ def test_chat_returns_503_when_ollama_request_fails(chat_test_client) -> None:
 
     assert response.status_code == 503
     assert response.json() == {"detail": "Ollama request failed."}
+
+
+def test_chat_rejects_empty_user_message(chat_test_client) -> None:
+    """
+    Verify that /chat rejects an empty user message.
+
+    ChatRequest requires user_message to contain at least one character.
+    FastAPI/Pydantic should therefore reject the request with HTTP 422
+    before routing or Ollama inference occurs.
+    """
+
+    test_client, mocked_ollama_client = chat_test_client
+
+    response = test_client.post(
+        "/chat",
+        json={
+            "user_message": "",
+            "router_mode": "fast",
+        },
+    )
+
+    assert response.status_code == 422
+
+    # Validation must happen before Ollama is contacted.
+    mocked_ollama_client.chat.assert_not_awaited()
+
+
+def test_chat_rejects_invalid_route_mode(chat_test_client) -> None:
+    """
+    Verify that /chat rejects unsupported route_mode values.
+
+    The public API accepts only:
+        - auto
+        - fast
+        - reasoning
+
+    Any other value should fail schema validation with HTTP 422
+    """
+
+    test_client, mocked_ollama_client = chat_test_client
+
+    response = test_client.post(
+        "/chat",
+        json={
+            "user_message": "What does CUDA stand for?",
+            "route_mode": "turbo",
+        },
+    )
+
+    assert response.status_code == 422
+
+    # Invalid API input must never reach the inference backend.
+    mocked_ollama_client.chat.assert_not_awaited()

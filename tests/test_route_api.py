@@ -38,6 +38,7 @@ from local_ai_router.main import app
 # but the test suite does not need to launvh a separate Uvicorn server.
 api_test_client = TestClient(app)
 
+
 def test_router_api_accepts_current_field_names() -> None:
     """
     Verify that /route accepts the project's standardized request fields.
@@ -45,7 +46,7 @@ def test_router_api_accepts_current_field_names() -> None:
     Request fields:
         user_message:
             The text that routing policy should inspect.
-        
+
         route_mode:
             Determines whether rouoting is automatic or explicitly selected.
 
@@ -74,12 +75,13 @@ def test_router_api_accepts_current_field_names() -> None:
     # so verify its meaning rather than requiring an exact sentence.
     assert "reasoning-heavy request" in response_data["route_reason"]
 
+
 def test_rout_api_selects_reasoning_for_complex_request() -> None:
     """
     Verify that automatic routing works through the HTTP API.
 
     This messafge deliberately includes several configured reasoning markers:
-    
+
         analyze
         architecture
         compare
@@ -89,7 +91,9 @@ def test_rout_api_selects_reasoning_for_complex_request() -> None:
     """
 
     request_body = {
-        "user_message": ("Analyze my local AI architecture and compare the trade-offs between using one model and several specialized models"),
+        "user_message": (
+            "Analyze my local AI architecture and compare the trade-offs between using one model and several specialized models"
+        ),
         "route_mode": "auto",
     }
 
@@ -102,6 +106,7 @@ def test_rout_api_selects_reasoning_for_complex_request() -> None:
     assert response_data["route_mode"] == "reasoning"
     assert response_data["thinking_enabled"] is True
     assert "reasoning-heavy request" in response_data["route_reason"]
+
 
 def test_route_api_rejects_old_request_field_names() -> None:
     """
