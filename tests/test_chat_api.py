@@ -140,9 +140,9 @@ def test_chat_fast_route_uses_non_thinking_inference(chat_test_client) -> None:
     # The public API exposes logical route_mode values, while the Ollama
     # adapter recieves the backend-specific Boolean 'think' value.
     mocked_ollama_client.chat.assert_awaited_once_with(
-        model=model_name,
+        model_name=model_name,
         user_message=user_message,
-        think=False,
+        thinking_enabled=False,
     )
 
 
@@ -177,9 +177,9 @@ def test_chat_reasoning_route_enables_thinking_inference(chat_test_client) -> No
     assert response_body["route_reason"] == "Reasoning mode explicitly requested."
 
     mocked_ollama_client.chat.assert_awaited_once_with(
-        model=model_name,
+        model_name=model_name,
         user_message=user_message,
-        think=True,
+        thinking_enabled=True,
     )
 
 
@@ -215,9 +215,9 @@ def test_chat_uses_default_model_when_model_name_not_specified(chat_test_client)
     assert response.json()["model_name"] == DEFAULT_MODEL
 
     mocked_ollama_client.chat.assert_awaited_once_with(
-        model=DEFAULT_MODEL,
+        model_name=DEFAULT_MODEL,
         user_message=user_message,
-        think=False,
+        thinking_enabled=False,
     )
 
 
@@ -272,7 +272,7 @@ def test_chat_rejects_empty_user_message(chat_test_client) -> None:
         "/chat",
         json={
             "user_message": "",
-            "router_mode": "fast",
+            "route_mode": "fast",
         },
     )
 

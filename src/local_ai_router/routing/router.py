@@ -28,56 +28,7 @@ Future versions may use additional signals such as model availability, hardware 
 or evaluation data.
 """
 
-from dataclasses import dataclass
-from typing import Literal
-
-# -----------------------------------------------------------------------------------------------
-# Type aliases
-# -----------------------------------------------------------------------------------------------
-#
-# Literal restricts these string values to a known set of valid choices.
-#
-# For example, RouteMode should only ever contain:
-#
-#   - "fast"
-#   - "reasoning"
-#
-# This improves readability and allows editors/type checkers to catch accidental values such a as "quick" or "reason".
-#
-RouteMode = Literal["fast", "reasoning"]
-
-# RequestMode represents the values a client is allowed to request.
-#
-# "auto" means the router decides.
-# "fast" and "reasoning" force a particular route.
-#
-RequestMode = Literal["auto", "fast", "reasoning"]
-
-
-@dataclass(frozen=True)
-class RoutingDecision:
-    """
-    Represents the result of evaluating a user request and deciding which route should handle it.
-
-    Attributes:
-        route_mode (RouteMode): Tthe logical route selected by the router.
-            Current Values:
-                - "fast": for ordinary questions and lightweight tasks.
-                - "reasoning": for tasks that appear to require deeper analysis.
-        thinking_enabled (bool): Whether the selected route should run in thinking/reasoning mode.
-            Current Values:
-                - True: thinking/reasoning mode enabled.
-                - False: thinking/reasoning mode disabled.
-        route_reason (str): A human-readable explanation of why this route was chosen.
-            This is deliberatly included so that routing decisions are inspectable rather than behaving as a black box.
-
-    The dataclass is marked frozen=True so a routing decision cannot be accidentaly modified after it has been created.
-    """
-
-    route_mode: RouteMode
-    thinking_enabled: bool
-    route_reason: str
-
+from .data import RequestMode, RoutingDecision
 
 # -----------------------------------------------------------------------------------------------
 # Automatic-routing indicators

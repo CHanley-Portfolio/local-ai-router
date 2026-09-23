@@ -15,9 +15,9 @@ Kepping the API schemas seperate from routing and interface logic
 prevents the HTTP interface from becoming tightly coupled to the internal implemenetation.
 """
 
-from typing import Literal
-
 from pydantic import BaseModel, Field
+
+from .routing.data import RequestMode, RouteMode
 
 
 class RouteRequest(BaseModel):
@@ -32,7 +32,7 @@ class RouteRequest(BaseModel):
             the users rrequest that should be classified.
             FFeld(min_length=1) prevets empty strings from being sent to the router.
 
-        route_mode (Literal["auto", "fast", "reasoning"]):
+        route_mode (RequestMode):
             Controls how routing is performed.
             "auto" means the router decides.
             "fast" and "reasoning" force a particular route.
@@ -41,7 +41,7 @@ class RouteRequest(BaseModel):
     """
 
     user_message: str = Field(min_length=1)
-    route_mode: Literal["auto", "fast", "reasoning"] = "auto"
+    route_mode: RequestMode = "auto"
 
 
 class RouteResponse(BaseModel):
@@ -49,7 +49,7 @@ class RouteResponse(BaseModel):
     Response returned by the /route endpoint.
 
     attributes:
-        route_mode (Literal["fast", "reasoning"]):
+        route_mode (RouteMode):
             The route that the router has chosen to handle the request.
         thinking_enabled (bool):
             True if the chosen route will run the AI model with thinking/reasoning mode enabled.
@@ -57,7 +57,7 @@ class RouteResponse(BaseModel):
             Human-readable explanation of routing decision.
     """
 
-    route_mode: Literal["fast", "reasoning"]
+    route_mode: RouteMode
     thinking_enabled: bool
     route_reason: str
 
@@ -74,7 +74,7 @@ class ChatRequest(BaseModel):
             This field exists primarily for testing and administrative use.
             Future client applications will normally allow the router itself to choose models.
 
-        route_mode (Literal["auto", "fast", "reasoning"]):
+        route_mode (RequestMode):
             Controls how routing is performed.
             "auto" means the router decides.
             "fast" means force non-thinking inference.
@@ -90,7 +90,7 @@ class ChatRequest(BaseModel):
 
     user_message: str = Field(min_length=1)
     model_name: str | None = None
-    route_mode: Literal["auto", "fast", "reasoning"] = "auto"
+    route_mode: RequestMode = "auto"
 
 
 class ChatResponse(BaseModel):
@@ -102,7 +102,7 @@ class ChatResponse(BaseModel):
         model_name (str):
             The Ollama model that actually genereated the response.
 
-        route_mode(Literal["fast", "reasoning"]):
+        route_mode (RequestMode):
             Logical route selected by routing policy.
 
         thinking_enabled (bool):
@@ -128,7 +128,7 @@ class ChatResponse(BaseModel):
     """
 
     model_name: str
-    route_mode: Literal["fast", "reasoning"]
+    route_mode: RouteMode
     thinking_enabled: bool
     route_reason: str
     response: str

@@ -271,10 +271,10 @@ async def chat(
         #
         # The API caller does not need to understand Ollama's "thinking_enabled"
         # implementation. Our router derives it from the logical route.
-        result = await request.app.state.ollama.chat(
-            model=model_name,
+        ollama_response = await request.app.state.ollama.chat(
+            model_name=model_name,
             user_message=payload.user_message,
-            think=decision.thinking_enabled,
+            thinking_enabled=decision.thinking_enabled,
         )
 
     except httpx.HTTPError as exc:
@@ -288,12 +288,12 @@ async def chat(
     # This abstraction means applications can continue using our API
     # even if we replace or add another inference backend later.
     return ChatResponse(
-        model_name=result.get("model", model_name),
+        model_name=ollama_response.get("model", model_name),
         route_mode=decision.route_mode,
         thinking_enabled=decision.thinking_enabled,
         route_reason=decision.route_reason,
-        response=result["message"]["content"],
-        total_duration_ns=result.get("total_duration"),
-        eval_count=result.get("eval_count"),
-        eval_duration_ns=result.get("eval_duration"),
+        response=ollama_response["message"]["content"],
+        total_duration_ns=ollama_response.get("total_duration"),
+        eval_count=ollama_response.get("eval_count"),
+        eval_duration_ns=ollama_response.get("eval_duration"),
     )
