@@ -1,0 +1,404 @@
+[
+  {
+    "case_id": "lar-coding-001",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "coding",
+    "tags": ["python", "fastapi", "validation"],
+    "prompt": "Write a FastAPI POST endpoint named /projects that accepts a project_name string and description string. project_name must contain at least one character. Return a Pydantic response containing project_id, project_name, and description. Keep the request and response schemas separate from the route handler.",
+    "context_fixture": null,
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Uses FastAPI correctly.",
+      "Defines separate request and response Pydantic models.",
+      "Enforces a non-empty project_name.",
+      "Defines POST /projects.",
+      "Returns the requested response fields."
+    ],
+    "critical": false
+  },
+  {
+    "case_id": "lar-coding-002",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "coding",
+    "tags": ["python", "async", "httpx"],
+    "prompt": "Implement an async Python function fetch_model_status(base_url: str) -> dict that requests GET /api/version using HTTPX. Reuse a supplied httpx.AsyncClient rather than creating a new client for every call, raise for unsuccessful HTTP status codes, and return the parsed JSON response.",
+    "context_fixture": null,
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Uses asynchronous HTTPX APIs.",
+      "Does not create a new AsyncClient inside every request when a client is supplied.",
+      "Calls /api/version.",
+      "Calls raise_for_status().",
+      "Returns parsed JSON."
+    ],
+    "critical": false
+  },
+  {
+    "case_id": "lar-coding-003",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "coding",
+    "tags": ["python", "dataclass", "typing"],
+    "prompt": "Create an immutable Python data contract named ModelCapabilityProfile with the fields model_name, supports_reasoning, supports_tools, supports_vision, and practical_context_tokens. Use explicit type annotations and make instances immutable after construction.",
+    "context_fixture": null,
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Defines ModelCapabilityProfile.",
+      "Uses explicit type annotations.",
+      "Contains all five requested fields with appropriate types.",
+      "Uses an immutable mechanism such as a frozen dataclass.",
+      "Does not add unnecessary getter/setter methods."
+    ],
+    "critical": false
+  },
+  {
+    "case_id": "lar-coding-004",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "coding",
+    "tags": ["python", "pytest", "mocking"],
+    "prompt": "Write a pytest test for an async inference client method named chat(). The test must verify that model_name='test-model', user_message='hello', and thinking_enabled=False are passed exactly once. Do not contact a real inference service.",
+    "context_fixture": null,
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Uses pytest-compatible test code.",
+      "Mocks the async chat method rather than calling a real backend.",
+      "Verifies the call occurred exactly once.",
+      "Checks model_name='test-model'.",
+      "Checks user_message='hello' and thinking_enabled=False."
+    ],
+    "critical": false
+  },
+
+  {
+    "case_id": "lar-debug-001",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "debugging",
+    "tags": ["python", "imports"],
+    "prompt": "A Python module imports RoutingDecision and then defines another class named RoutingDecision in the same module. Ruff reports F811 redefinition of unused RoutingDecision. Explain the root cause and the smallest correct fix.",
+    "context_fixture": null,
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Identifies the duplicate definition as the root cause.",
+      "Explains that the imported centralized contract should remain authoritative.",
+      "Recommends removing the duplicate local class rather than renaming around the problem.",
+      "Does not propose disabling F811."
+    ],
+    "critical": false
+  },
+  {
+    "case_id": "lar-debug-002",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "debugging",
+    "tags": ["python", "virtualenv", "filesystem"],
+    "prompt": "A Python virtual environment worked until the repository directory was renamed. After the rename, executables inside .venv reference the old absolute project path. Explain why this happens and give the safest recovery approach.",
+    "context_fixture": null,
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Explains that virtual environments contain absolute or environment-specific paths.",
+      "Connects the repository rename to the broken environment.",
+      "Recommends recreating the virtual environment or restoring the original path.",
+      "Does not recommend manually editing numerous virtualenv files."
+    ],
+    "critical": false
+  },
+  {
+    "case_id": "lar-debug-003",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "debugging",
+    "tags": ["fastapi", "pytest", "validation"],
+    "prompt": "A test named test_chat_rejects_empty_user_message sends {'user_message': '', 'router_mode': 'fast'} and receives HTTP 422, so the test passes. Explain why this test can still hide a bug and how to correct it.",
+    "context_fixture": null,
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Recognizes that user_message='' independently causes HTTP 422.",
+      "Identifies router_mode as the incorrect field name.",
+      "Explains that the test could pass for the wrong reason.",
+      "Recommends changing router_mode to route_mode."
+    ],
+    "critical": true
+  },
+  {
+    "case_id": "lar-debug-004",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "debugging",
+    "tags": ["api", "http", "error-handling"],
+    "prompt": "A FastAPI service depends on a local inference backend. The backend cannot be reached because the process is stopped. Should the API return HTTP 400, 404, 500, or 503? Explain the choice.",
+    "context_fixture": null,
+    "scoring_method": "exact_with_explanation",
+    "expected_answer": "503",
+    "expected_criteria": [
+      "Selects HTTP 503 Service Unavailable.",
+      "Explains that the API is running but a required downstream service is unavailable."
+    ],
+    "critical": false
+  },
+
+  {
+    "case_id": "lar-architecture-001",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "architecture",
+    "tags": ["domain-models", "pydantic", "separation-of-concerns"],
+    "prompt": "Explain why an internal RoutingDecision domain object should remain separate from FastAPI Pydantic request/response schemas and from future SQLAlchemy database models.",
+    "context_fixture": null,
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Explains that domain, transport, and persistence models have different responsibilities.",
+      "Describes reduced coupling.",
+      "Explains why API changes should not automatically redefine internal domain objects.",
+      "Explains why database schema concerns should not leak into routing logic."
+    ],
+    "critical": false
+  },
+  {
+    "case_id": "lar-architecture-002",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "architecture",
+    "tags": ["adapter", "ollama", "abstraction"],
+    "prompt": "The application uses the names model_name and thinking_enabled, while Ollama expects JSON keys model and think. Where should this translation occur and why?",
+    "context_fixture": null,
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Places translation inside the Ollama/backend adapter.",
+      "Keeps application-facing terminology backend-independent.",
+      "Explains that this makes future inference backends easier to add.",
+      "Does not recommend exposing Ollama-specific names throughout the application."
+    ],
+    "critical": true
+  },
+  {
+    "case_id": "lar-architecture-003",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "architecture",
+    "tags": ["routing", "models", "benchmarking"],
+    "prompt": "Design the responsibility boundary between a routing policy, model registry, and inference backend. Explain what each component should know and what it should not know.",
+    "context_fixture": null,
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Routing policy decides required behavior or capabilities.",
+      "Model registry describes available model capabilities and configuration.",
+      "Inference backend handles runtime-specific communication.",
+      "Avoids tightly coupling routing policy to backend-specific model identifiers.",
+      "Recognizes benchmark data as evidence that can inform model selection."
+    ],
+    "critical": false
+  },
+  {
+    "case_id": "lar-architecture-004",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "architecture",
+    "tags": ["rag", "context", "memory"],
+    "prompt": "A project contains 300 pages of documentation, but a user asks a question requiring only two paragraphs from one document. Compare injecting all documentation into the prompt with retrieving only relevant chunks. Recommend an architecture and explain the trade-offs.",
+    "context_fixture": null,
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Recommends retrieval rather than indiscriminately injecting all documentation.",
+      "Discusses context-window cost.",
+      "Discusses answer-quality degradation or distraction from irrelevant context.",
+      "Mentions retrieval quality as a new failure mode.",
+      "Preserves source/provenance as desirable."
+    ],
+    "critical": false
+  },
+
+  {
+    "case_id": "lar-database-001",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "database",
+    "tags": ["postgresql", "benchmarking", "schema"],
+    "prompt": "Design the core PostgreSQL entities needed to preserve historical AI benchmark results. The design must support models, benchmark suites, benchmark cases, benchmark runs, individual case results, hardware profiles, and model configurations. Describe the primary relationships.",
+    "context_fixture": null,
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Separates benchmark suite/case definitions from benchmark executions.",
+      "Represents models independently from benchmark runs.",
+      "Includes durable benchmark run and case-result entities.",
+      "Associates hardware and model configuration with runs.",
+      "Preserves historical results rather than overwriting prior runs."
+    ],
+    "critical": false
+  },
+  {
+    "case_id": "lar-database-002",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "database",
+    "tags": ["postgresql", "normalization"],
+    "prompt": "A benchmark system currently stores model_name, gpu_name, benchmark_name, prompt, response, and score repeatedly in one large table for every result. Explain the main relational-design problems and propose a better normalized structure.",
+    "context_fixture": null,
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Identifies repeated model/hardware/benchmark metadata.",
+      "Explains update/inconsistency risks.",
+      "Proposes separate referenced entities with primary and foreign keys.",
+      "Retains individual case-result records.",
+      "Avoids over-normalizing raw response data out of existence."
+    ],
+    "critical": false
+  },
+  {
+    "case_id": "lar-database-003",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "database",
+    "tags": ["sql", "historical-data"],
+    "prompt": "Write a PostgreSQL query conceptually selecting the five most recent benchmark runs for one model, including run timestamp, benchmark suite name, average quality score, average output tokens per second, and peak VRAM. Assume normalized tables and clearly state any table/column names you invent.",
+    "context_fixture": null,
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Uses a model filter.",
+      "Orders by run timestamp descending.",
+      "Limits results to five.",
+      "Correctly uses aggregation where case-level metrics require it.",
+      "Clearly states assumed schema names rather than pretending they were supplied."
+    ],
+    "critical": false
+  },
+  {
+    "case_id": "lar-database-004",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "database",
+    "tags": ["migrations", "postgresql", "schema-evolution"],
+    "prompt": "Explain why this project should use database migrations rather than manually editing PostgreSQL tables as the benchmark schema evolves. Include how migrations help development, testing, and portfolio reproducibility.",
+    "context_fixture": null,
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Explains repeatable schema evolution.",
+      "Explains version-controlled database changes.",
+      "Connects migrations to clean environment setup/testing.",
+      "Explains reproducibility for other developers or reviewers."
+    ],
+    "critical": false
+  },
+
+  {
+    "case_id": "lar-context-001",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "project_context",
+    "tags": ["retrieval", "authority", "project-docs"],
+    "prompt": "According to the supplied project context, which database should the application use and what database should not be used?",
+    "context_fixture": "project_database_decision_v1.md",
+    "scoring_method": "exact_with_explanation",
+    "expected_answer": "PostgreSQL; do not use SQLite as the production application database.",
+    "expected_criteria": [
+      "Selects PostgreSQL.",
+      "States that SQLite should not be used as the production application database.",
+      "Bases the answer on supplied context rather than introducing an unrelated database."
+    ],
+    "critical": true
+  },
+  {
+    "case_id": "lar-context-002",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "project_context",
+    "tags": ["retrieval", "conflicting-information"],
+    "prompt": "The supplied context contains an older proposal and a newer final decision about project storage. State the current decision and identify which statement should be treated as obsolete.",
+    "context_fixture": "project_storage_decision_v1.md",
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Identifies the newer decision as authoritative.",
+      "Identifies the older proposal as obsolete.",
+      "Does not merge mutually exclusive decisions together.",
+      "Explains the temporal or authority signal used."
+    ],
+    "critical": true
+  },
+  {
+    "case_id": "lar-context-003",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "project_context",
+    "tags": ["retrieval", "irrelevant-context"],
+    "prompt": "Using only information relevant to the question in the supplied project context, state which drive is reserved for games and whether Local AI model files should be stored there.",
+    "context_fixture": "project_drive_policy_v1.md",
+    "scoring_method": "exact_with_explanation",
+    "expected_answer": "/ssd2 is reserved for games/emulation; Local AI model files should not be stored there.",
+    "expected_criteria": [
+      "Identifies /ssd2.",
+      "States that it is reserved for games/emulation.",
+      "States that Local AI model files should not use it.",
+      "Ignores unrelated context."
+    ],
+    "critical": true
+  },
+  {
+    "case_id": "lar-context-004",
+    "case_version": 1,
+    "evaluation_target": "model",
+    "category": "project_context",
+    "tags": ["summarization", "decision-extraction"],
+    "prompt": "Read the supplied project notes and return only the three final architectural decisions. Do not include rejected alternatives or brainstorming ideas.",
+    "context_fixture": "architecture_decisions_v1.md",
+    "scoring_method": "rubric",
+    "expected_criteria": [
+      "Returns exactly three decisions.",
+      "Includes all three final decisions.",
+      "Excludes explicitly rejected alternatives.",
+      "Does not convert brainstorming items into final decisions."
+    ],
+    "critical": false
+  },
+
+  {
+    "case_id": "lar-routing-001",
+    "case_version": 1,
+    "evaluation_target": "router",
+    "category": "routing",
+    "tags": ["simple-question", "fast"],
+    "prompt": "What does CUDA stand for?",
+    "context_fixture": null,
+    "scoring_method": "exact",
+    "expected_route_mode": "fast",
+    "critical": false
+  },
+  {
+    "case_id": "lar-routing-002",
+    "case_version": 1,
+    "evaluation_target": "router",
+    "category": "routing",
+    "tags": ["architecture", "reasoning"],
+    "prompt": "I have three local models with different coding, reasoning, and context-window performance. Compare the architectural trade-offs of routing every request to the largest model versus using capability-based model selection with fallback behavior.",
+    "context_fixture": null,
+    "scoring_method": "exact",
+    "expected_route_mode": "reasoning",
+    "critical": true
+  },
+  {
+    "case_id": "lar-routing-003",
+    "case_version": 1,
+    "evaluation_target": "router",
+    "category": "routing",
+    "tags": ["short-complex", "reasoning"],
+    "prompt": "Why can a database transaction deadlock even when both queries individually succeed?",
+    "context_fixture": null,
+    "scoring_method": "exact",
+    "expected_route_mode": "reasoning",
+    "critical": true
+  },
+  {
+    "case_id": "lar-routing-004",
+    "case_version": 1,
+    "evaluation_target": "router",
+    "category": "routing",
+    "tags": ["long-simple", "fast"],
+    "prompt": "Summarize the following supplied text into five bullet points without adding analysis.",
+    "context_fixture": "long_simple_summary_v1.md",
+    "scoring_method": "exact",
+    "expected_route_mode": "fast",
+    "critical": true
+  }
+]
