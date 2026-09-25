@@ -4,6 +4,8 @@
 #
 #    pip-compile --extra=dev --no-index --output-file=requirements-dev.lock.txt --strip-extras pyproject.toml
 #
+alembic==1.20.0
+    # via local-ai-router (pyproject.toml)
 annotated-doc==0.0.5
     # via
     #   fastapi
@@ -55,10 +57,14 @@ iniconfig==2.3.0
     # via pytest
 jinja2==3.1.6
     # via fastapi
+mako==1.4.3
+    # via alembic
 markdown-it-py==4.2.0
     # via rich
 markupsafe==3.0.3
-    # via jinja2
+    # via
+    #   jinja2
+    #   mako
 mdurl==0.1.2
     # via markdown-it-py
 packaging==26.3
@@ -70,6 +76,8 @@ pip-tools==7.6.1
     # via local-ai-router (pyproject.toml)
 pluggy==1.6.0
     # via pytest
+psycopg==3.3.6
+    # via local-ai-router (pyproject.toml)
 pydantic==2.13.5
     # via
     #   fastapi
@@ -105,22 +113,29 @@ rich==15.0.0
     #   typer
 rich-toolkit==0.20.5
     # via fastapi-cli
-ruff==0.16.8
+ruff==0.16.9
     # via local-ai-router (pyproject.toml)
 shellingham==1.5.4
     # via typer
+sqlalchemy==2.1.1
+    # via
+    #   alembic
+    #   local-ai-router (pyproject.toml)
 starlette==1.6.0
     # via fastapi
 typer==0.27.2
     # via fastapi-cli
 typing-extensions==4.16.0
     # via
+    #   alembic
     #   anyio
     #   fastapi
+    #   psycopg
     #   pydantic
     #   pydantic-core
     #   pydantic-extra-types
     #   rich-toolkit
+    #   sqlalchemy
     #   starlette
     #   typing-inspection
 typing-inspection==0.4.4

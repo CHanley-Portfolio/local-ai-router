@@ -56,6 +56,8 @@ markupsafe==3.0.3
     # via jinja2
 mdurl==0.1.2
     # via markdown-it-py
+psycopg==3.3.6
+    # via local-ai-router (pyproject.toml)
 pydantic==2.13.5
     # via
     #   fastapi
@@ -85,6 +87,8 @@ rich-toolkit==0.20.5
     # via fastapi-cli
 shellingham==1.5.4
     # via typer
+sqlalchemy==2.1.1
+    # via local-ai-router (pyproject.toml)
 starlette==1.6.0
     # via fastapi
 typer==0.27.2
@@ -93,10 +97,12 @@ typing-extensions==4.16.0
     # via
     #   anyio
     #   fastapi
+    #   psycopg
     #   pydantic
     #   pydantic-core
     #   pydantic-extra-types
     #   rich-toolkit
+    #   sqlalchemy
     #   starlette
     #   typing-inspection
 typing-inspection==0.4.4
