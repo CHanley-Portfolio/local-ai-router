@@ -20,11 +20,27 @@ from alembic import context
 from sqlalchemy import Connection
 
 from local_ai_router.persistence.benchmark.base import BenchmarkBase
+from local_ai_router.persistence.benchmark.models import (
+    BenchmarkCase,
+    BenchmarkCaseTag,
+    BenchmarkCategory,
+    BenchmarkDefinition,
+    BenchmarkModel,
+    BenchmarkRun,
+    BenchmarkSuite,
+    BenchmarkSuiteCase,
+    BenchmarkTag,
+    ContextProfile,
+    HardwareProfile,
+    ModelProfile,
+    ModelVariant,
+    Quantization,
+    RuntimeProfile,
+)
 from local_ai_router.persistence.database import (
     build_database_url,
     create_database_engine,
 )
-
 
 # Alembic provides this configuration object when a migration command runs.
 alembic_config = context.config
@@ -35,6 +51,27 @@ alembic_config = context.config
 if alembic_config.config_file_name is not None:
     fileConfig(alembic_config.config_file_name)
 
+
+# Importing the ORM model classes registers their tables with
+# BenchmarkBase.metadata. Keeping this tuple also makes the registration
+# dependency explicit for readers and static-analysis tools.
+BENCHMARK_MODEL_TYPES = (
+    BenchmarkRun,
+    HardwareProfile,
+    RuntimeProfile,
+    ContextProfile,
+    BenchmarkModel,
+    Quantization,
+    ModelVariant,
+    ModelProfile,
+    BenchmarkDefinition,
+    BenchmarkCategory,
+    BenchmarkCase,
+    BenchmarkTag,
+    BenchmarkCaseTag,
+    BenchmarkSuite,
+    BenchmarkSuiteCase,
+)
 
 # This is the SQLAlchemy metadata Alembic will inspect during autogeneration.
 #

@@ -8,7 +8,7 @@ Keeping connection management centralized prevents persistance classes from beco
 PostgreSQL connection details, or SQLAlchemy engine configuration.
 """
 
-from sqlalchemy import Engine, URL, create_engine
+from sqlalchemy import URL, Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from local_ai_router.config import DatabaseSettings, get_database_settings

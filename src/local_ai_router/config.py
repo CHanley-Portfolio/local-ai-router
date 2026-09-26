@@ -9,7 +9,6 @@ and are never hard-coded into the repository.
 import os
 from dataclasses import dataclass
 
-
 OLLAMA_BASE_URL = os.getenv(
     "OLLAMA_BASE_URL",
     "http://127.0.0.1:11434",

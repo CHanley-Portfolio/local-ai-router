@@ -78,6 +78,8 @@ pluggy==1.6.0
     # via pytest
 psycopg==3.3.6
     # via local-ai-router (pyproject.toml)
+psycopg-binary==3.3.6
+    # via psycopg
 pydantic==2.13.5
     # via
     #   fastapi
