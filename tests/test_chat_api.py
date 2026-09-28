@@ -34,6 +34,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from local_ai_router.config import DEFAULT_MODEL
+from local_ai_router.inference import InferenceRequest, InferenceResult
 from local_ai_router.main import app
 from local_ai_router.ollama_client import OllamaClient
 
@@ -101,17 +102,14 @@ def test_chat_fast_route_uses_non_thinking_inference(chat_test_client) -> None:
     user_message = "What does CUDA stand for?"
     model_name = "test-model"
 
-    # Simulate the JSON structure returnedby Ollama's /api/chat endpoint.
-    mocked_ollama_client.chat.return_value = {
-        "model": model_name,
-        "message": {
-            "role": "assistant",
-            "content": "CUDA stands for Compute Unified Device Architecture.",
-        },
-        "total_duration": 1_000_000,
-        "eval_count": 12,
-        "eval_duration": 500_000,
-    }
+    # Simulate the normalized inference result returned by OllamaClient.
+    mocked_ollama_client.chat.return_value = InferenceResult(
+        model_name=model_name,
+        response_text="CUDA stands for Compute Unified Device Architecture.",
+        total_duration_ns=1_000_000,
+        output_token_count=12,
+        output_eval_duration_ns=500_000,
+    )
 
     response = test_client.post(
         "/chat",
@@ -140,9 +138,11 @@ def test_chat_fast_route_uses_non_thinking_inference(chat_test_client) -> None:
     # The public API exposes logical route_mode values, while the Ollama
     # adapter recieves the backend-specific Boolean 'think' value.
     mocked_ollama_client.chat.assert_awaited_once_with(
-        model_name=model_name,
-        user_message=user_message,
-        thinking_enabled=False,
+        InferenceRequest(
+            model_name=model_name,
+            user_message=user_message,
+            thinking_enabled=False,
+        )
     )
 
 
@@ -158,10 +158,10 @@ def test_chat_reasoning_route_enables_thinking_inference(chat_test_client) -> No
     user_message = "Analyze the trade-offs between these two architectures."
     model_name = "test-model"
 
-    mocked_ollama_client.chat.return_value = {
-        "model": model_name,
-        "message": {"role": "assistant", "content": "Here is the architectural analysis"},
-    }
+    mocked_ollama_client.chat.return_value = InferenceResult(
+        model_name=model_name,
+        response_text="Here is the architectural analysis",
+    )
 
     response = test_client.post(
         "/chat",
@@ -177,9 +177,11 @@ def test_chat_reasoning_route_enables_thinking_inference(chat_test_client) -> No
     assert response_body["route_reason"] == "Reasoning mode explicitly requested."
 
     mocked_ollama_client.chat.assert_awaited_once_with(
-        model_name=model_name,
-        user_message=user_message,
-        thinking_enabled=True,
+        InferenceRequest(
+            model_name=model_name,
+            user_message=user_message,
+            thinking_enabled=True,
+        )
     )
 
 
@@ -195,13 +197,10 @@ def test_chat_uses_default_model_when_model_name_not_specified(chat_test_client)
 
     user_message = "What does CUDA stand for?"
 
-    mocked_ollama_client.chat.return_value = {
-        "model": DEFAULT_MODEL,
-        "message": {
-            "role": "assistant",
-            "content": "CUDA stands for Compute Unified Device Architecture.",
-        },
-    }
+    mocked_ollama_client.chat.return_value = InferenceResult(
+        model_name=DEFAULT_MODEL,
+        response_text="CUDA stands for Compute Unified Device Architecture.",
+    )
 
     response = test_client.post(
         "/chat",
@@ -215,9 +214,11 @@ def test_chat_uses_default_model_when_model_name_not_specified(chat_test_client)
     assert response.json()["model_name"] == DEFAULT_MODEL
 
     mocked_ollama_client.chat.assert_awaited_once_with(
-        model_name=DEFAULT_MODEL,
-        user_message=user_message,
-        thinking_enabled=False,
+        InferenceRequest(
+            model_name=DEFAULT_MODEL,
+            user_message=user_message,
+            thinking_enabled=False,
+        )
     )
 
 

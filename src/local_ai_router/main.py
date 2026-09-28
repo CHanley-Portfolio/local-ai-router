@@ -42,6 +42,7 @@ import httpx
 from fastapi import FastAPI, HTTPException, Request
 
 from .config import DEFAULT_MODEL
+from .inference import InferenceRequest
 from .ollama_client import OllamaClient
 from .routing import choose_route
 from .schemas import ChatRequest, ChatResponse, RouteRequest, RouteResponse
@@ -271,10 +272,12 @@ async def chat(
         #
         # The API caller does not need to understand Ollama's "thinking_enabled"
         # implementation. Our router derives it from the logical route.
-        ollama_response = await request.app.state.ollama.chat(
-            model_name=model_name,
-            user_message=payload.user_message,
-            thinking_enabled=decision.thinking_enabled,
+        inference_result = await request.app.state.ollama.chat(
+            InferenceRequest(
+                model_name=model_name,
+                user_message=payload.user_message,
+                thinking_enabled=decision.thinking_enabled,
+            )
         )
 
     except httpx.HTTPError as exc:
@@ -288,12 +291,12 @@ async def chat(
     # This abstraction means applications can continue using our API
     # even if we replace or add another inference backend later.
     return ChatResponse(
-        model_name=ollama_response.get("model", model_name),
+        model_name=inference_result.model_name,
         route_mode=decision.route_mode,
         thinking_enabled=decision.thinking_enabled,
         route_reason=decision.route_reason,
-        response=ollama_response["message"]["content"],
-        total_duration_ns=ollama_response.get("total_duration"),
-        eval_count=ollama_response.get("eval_count"),
-        eval_duration_ns=ollama_response.get("eval_duration"),
+        response=inference_result.response_text,
+        total_duration_ns=inference_result.total_duration_ns,
+        eval_count=inference_result.output_token_count,
+        eval_duration_ns=inference_result.output_eval_duration_ns,
     )
