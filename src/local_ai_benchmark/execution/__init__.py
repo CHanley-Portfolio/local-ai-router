@@ -1,26 +1,27 @@
 """
-Shared benchmark execution data contracts.
+Automated benchmark execution infrastructure.
 
-This package re-exports benchmark execution objects so callers can import
-stable application contracts from ``local_ai_router.benchmarking.data``
-without depending on individual implementation modules.
+Public benchmark execution contracts are re-exported here so application code
+can depend on the benchmarking package rather than individual modules.
 """
 
-from .benchmark_case_execution import (
+from .data import (
     BenchmarkCaseExecution as BenchmarkCaseExecution,
 )
-from .benchmark_case_execution import (
+from .data import (
     BenchmarkCaseExecutionStatus as BenchmarkCaseExecutionStatus,
 )
-from .benchmark_case_request import (
+from .data import (
     BenchmarkCaseRequest as BenchmarkCaseRequest,
 )
-from .benchmark_run_summary import (
+from .data import (
     BenchmarkRunExecutionStatus as BenchmarkRunExecutionStatus,
 )
-from .benchmark_run_summary import (
+from .data import (
     BenchmarkRunSummary as BenchmarkRunSummary,
 )
+from .inference_executor import InferenceExecutor as InferenceExecutor
+from .runner import BenchmarkRunner as BenchmarkRunner
 
 __all__ = [
     "BenchmarkCaseExecution",
@@ -28,4 +29,6 @@ __all__ = [
     "BenchmarkCaseRequest",
     "BenchmarkRunExecutionStatus",
     "BenchmarkRunSummary",
+    "BenchmarkRunner",
+    "InferenceExecutor",
 ]

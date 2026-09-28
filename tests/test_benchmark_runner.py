@@ -10,11 +10,11 @@ from dataclasses import FrozenInstanceError
 
 import pytest
 
-from local_ai_router.benchmarking import (
+from local_ai_benchmark import (
     BenchmarkCaseRequest,
     BenchmarkRunner,
 )
-from local_ai_router.inference import InferenceRequest, InferenceResult
+from local_ai_inference import InferenceRequest, InferenceResult
 
 
 class SuccessfulFakeInferenceExecutor:
@@ -200,6 +200,7 @@ def test_benchmark_case_execution_is_immutable() -> None:
     with pytest.raises(FrozenInstanceError):
         execution.status = "failed"  # type: ignore[misc]
 
+
 def test_benchmark_runner_executes_suite_in_request_order() -> None:
     """
     Verify suite orchestration preserves benchmark-case execution order.
@@ -243,18 +244,12 @@ def test_benchmark_runner_executes_suite_in_request_order() -> None:
     assert summary.completed_case_count == 2
     assert summary.failed_case_count == 0
 
-    assert [
-        execution.benchmark_case_id
-        for execution in summary.case_executions
-    ] == [
+    assert [execution.benchmark_case_id for execution in summary.case_executions] == [
         101,
         102,
     ]
 
-    assert [
-        request.user_message
-        for request in fake_executor.received_requests
-    ] == [
+    assert [request.user_message for request in fake_executor.received_requests] == [
         "first",
         "second",
     ]
@@ -316,16 +311,10 @@ def test_benchmark_runner_continues_after_case_failure() -> None:
     assert failed_execution.benchmark_case_id == 202
     assert failed_execution.status == "failed"
     assert failed_execution.error_type == "RuntimeError"
-    assert (
-        failed_execution.error_message
-        == "Synthetic suite failure."
-    )
+    assert failed_execution.error_message == "Synthetic suite failure."
 
     # Most importantly, the third request was still executed.
-    assert [
-        request.user_message
-        for request in fake_executor.received_requests
-    ] == [
+    assert [request.user_message for request in fake_executor.received_requests] == [
         "first",
         "fail",
         "third",
@@ -337,9 +326,7 @@ def test_benchmark_runner_rejects_empty_suite() -> None:
     Verify suite execution cannot silently produce a meaningless empty run.
     """
 
-    benchmark_runner = BenchmarkRunner(
-        SequencedFakeInferenceExecutor()
-    )
+    benchmark_runner = BenchmarkRunner(SequencedFakeInferenceExecutor())
 
     with pytest.raises(
         ValueError,
@@ -358,9 +345,7 @@ def test_benchmark_run_summary_is_immutable() -> None:
     Verify completed suite summaries cannot be mutated accidentally.
     """
 
-    benchmark_runner = BenchmarkRunner(
-        SequencedFakeInferenceExecutor()
-    )
+    benchmark_runner = BenchmarkRunner(SequencedFakeInferenceExecutor())
 
     summary = asyncio.run(
         benchmark_runner.execute_suite(

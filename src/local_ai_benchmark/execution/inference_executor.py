@@ -9,7 +9,7 @@ this protocol through Python's structural typing.
 
 from typing import Protocol
 
-from local_ai_router.inference import InferenceRequest, InferenceResult
+from local_ai_inference import InferenceRequest, InferenceResult
 
 
 class InferenceExecutor(Protocol):

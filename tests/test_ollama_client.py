@@ -11,8 +11,7 @@ from decimal import Decimal
 
 import httpx
 
-from local_ai_router.inference import InferenceRequest
-from local_ai_router.ollama_client import OllamaClient
+from local_ai_inference import InferenceRequest, OllamaClient
 
 
 def test_ollama_client_translates_inference_request() -> None:
@@ -43,7 +42,9 @@ def test_ollama_client_translates_inference_request() -> None:
         )
 
     async def execute_test() -> None:
-        ollama_client = OllamaClient()
+        ollama_client = OllamaClient(
+            base_url="http://test-ollama",
+        )
 
         await ollama_client._client.aclose()
 
@@ -116,7 +117,9 @@ def test_ollama_client_normalizes_response_metrics() -> None:
         )
 
     async def execute_test():
-        ollama_client = OllamaClient()
+        ollama_client = OllamaClient(
+            base_url="http://test-ollama",
+        )
 
         await ollama_client._client.aclose()
 
@@ -183,7 +186,9 @@ def test_explicit_inference_settings_override_backend_options() -> None:
         )
 
     async def execute_test() -> None:
-        ollama_client = OllamaClient()
+        ollama_client = OllamaClient(
+            base_url="http://test-ollama",
+        )
 
         await ollama_client._client.aclose()
 

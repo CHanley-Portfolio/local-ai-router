@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Literal
 
-from local_ai_router.inference import InferenceResult
+from local_ai_inference import InferenceResult
 
 BenchmarkCaseExecutionStatus = Literal[
     "completed",

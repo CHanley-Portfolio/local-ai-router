@@ -41,9 +41,9 @@ from contextlib import asynccontextmanager
 import httpx
 from fastapi import FastAPI, HTTPException, Request
 
-from .config import DEFAULT_MODEL
-from .inference import InferenceRequest
-from .ollama_client import OllamaClient
+from local_ai_inference import InferenceRequest, OllamaClient
+
+from .config import DEFAULT_MODEL, OLLAMA_BASE_URL
 from .routing import choose_route
 from .schemas import ChatRequest, ChatResponse, RouteRequest, RouteResponse
 
@@ -79,7 +79,7 @@ async def lifespan(app: FastAPI):
     """
 
     # Create our shared Ollama API client during application startup.
-    app.state.ollama = OllamaClient()
+    app.state.ollama = OllamaClient(base_url=OLLAMA_BASE_URL)
 
     # Everything before yield runs during startup.
     # EVerything after yield runs during shutdown.

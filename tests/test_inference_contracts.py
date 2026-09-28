@@ -7,7 +7,7 @@ from decimal import Decimal
 
 import pytest
 
-from local_ai_router.inference import InferenceRequest, InferenceResult
+from local_ai_inference import InferenceRequest, InferenceResult
 
 
 def test_inference_request_uses_explicit_application_fields() -> None:

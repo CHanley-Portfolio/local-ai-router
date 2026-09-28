@@ -2,14 +2,28 @@ from typing import Any
 
 import httpx
 
-from .config import OLLAMA_BASE_URL
-from .inference import InferenceRequest, InferenceResult
+from .data import InferenceRequest, InferenceResult
 
 
 class OllamaClient:
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        base_url: str,
+    ) -> None:
+        """
+        Create an Ollama inference adapter.
+
+        Args:
+            base_url:
+                Base HTTP URL of the Ollama service.
+
+                Service-specific configuration remains outside this shared
+                inference package. The router, benchmark service, or another
+                caller supplies the appropriate endpoint.
+        """
+
         self._client = httpx.AsyncClient(
-            base_url=OLLAMA_BASE_URL,
+            base_url=base_url,
             timeout=httpx.Timeout(
                 120.0,
                 connect=5.0,

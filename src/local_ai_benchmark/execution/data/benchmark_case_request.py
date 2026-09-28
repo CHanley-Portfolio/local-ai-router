@@ -7,7 +7,7 @@ normalized inference request that should be executed for that case.
 
 from dataclasses import dataclass
 
-from local_ai_router.inference import InferenceRequest
+from local_ai_inference import InferenceRequest
 
 
 @dataclass(frozen=True)

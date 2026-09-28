@@ -9,13 +9,14 @@ rather than embeddding every benchmark concern inside this class.
 
 from datetime import datetime, timezone
 
-from local_ai_router.benchmarking.data import (
+from local_ai_inference import InferenceRequest
+
+from .data import (
     BenchmarkCaseExecution,
     BenchmarkCaseRequest,
     BenchmarkRunSummary,
 )
-from local_ai_router.benchmarking.inference_executor import InferenceExecutor
-from local_ai_router.inference import InferenceRequest
+from .inference_executor import InferenceExecutor
 
 
 class BenchmarkRunner:
@@ -53,7 +54,9 @@ class BenchmarkRunner:
 
         self._inference_executor = inference_executor
 
-    async def execute_case(self, *, benchmark_case_id: int, inference_request: InferenceRequest) -> BenchmarkCaseExecution:
+    async def execute_case(
+        self, *, benchmark_case_id: int, inference_request: InferenceRequest
+    ) -> BenchmarkCaseExecution:
         """
         Execute one benchmark case.
 
@@ -112,7 +115,9 @@ class BenchmarkRunner:
             inference_result=inference_result,
         )
 
-    async def execute_suite(self, *, benchmark_suite_id: int, case_requests: tuple[BenchmarkCaseRequest, ...]) -> BenchmarkRunSummary:
+    async def execute_suite(
+        self, *, benchmark_suite_id: int, case_requests: tuple[BenchmarkCaseRequest, ...]
+    ) -> BenchmarkRunSummary:
         """
         Execute every case in one benchmark suite.
 
@@ -145,9 +150,7 @@ class BenchmarkRunner:
         """
 
         if not case_requests:
-            raise ValueError(
-                "A benchmark suite must contain at least one case request."
-            )
+            raise ValueError("A benchmark suite must contain at least one case request.")
 
         started_at = datetime.now(timezone.utc)
 
@@ -164,20 +167,14 @@ class BenchmarkRunner:
         completed_at = datetime.now(timezone.utc)
 
         completed_case_count = sum(
-            case_execution.status == "completed"
-            for case_execution in case_executions
+            case_execution.status == "completed" for case_execution in case_executions
         )
 
         failed_case_count = sum(
-            case_execution.status == "failed"
-            for case_execution in case_executions
+            case_execution.status == "failed" for case_execution in case_executions
         )
 
-        run_status = (
-            "completed"
-            if failed_case_count == 0
-            else "completed_with_failures"
-        )
+        run_status = "completed" if failed_case_count == 0 else "completed_with_failures"
 
         return BenchmarkRunSummary(
             benchmark_suite_id=benchmark_suite_id,
