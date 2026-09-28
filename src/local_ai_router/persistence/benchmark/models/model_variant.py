@@ -26,6 +26,9 @@ if TYPE_CHECKING:
     from local_ai_router.persistence.benchmark.models.benchmark_model import (
         BenchmarkModel,
     )
+    from local_ai_router.persistence.benchmark.models.benchmark_reference_result import (
+        BenchmarkReferenceResult,
+    )
     from local_ai_router.persistence.benchmark.models.model_profile import ModelProfile
     from local_ai_router.persistence.benchmark.models.quantization import Quantization
 
@@ -117,5 +120,9 @@ class ModelVariant(BenchmarkBase):
     )
 
     model_profiles: Mapped[list["ModelProfile"]] = relationship(
+        back_populates="model_variant",
+    )
+
+    benchmark_reference_results: Mapped[list["BenchmarkReferenceResult"]] = relationship(
         back_populates="model_variant",
     )

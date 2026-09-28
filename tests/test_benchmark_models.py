@@ -6,12 +6,18 @@ database. Database migration and integration behavior will be tested
 separately.
 """
 
+from sqlalchemy.orm import configure_mappers
+
 from local_ai_router.persistence.benchmark.base import BenchmarkBase
 from local_ai_router.persistence.benchmark.models import (
     BenchmarkCase,
+    BenchmarkCaseResult,
     BenchmarkCaseTag,
     BenchmarkDefinition,
     BenchmarkModel,
+    BenchmarkPerformanceMetric,
+    BenchmarkQualityScore,
+    BenchmarkReferenceResult,
     BenchmarkRun,
     BenchmarkSuite,
     BenchmarkSuiteCase,
@@ -412,3 +418,200 @@ def test_benchmark_run_lifecycle_fields_have_expected_nullability() -> None:
     assert BenchmarkRun.__table__.c.status.nullable is False
     assert BenchmarkRun.__table__.c.started_at.nullable is False
     assert BenchmarkRun.__table__.c.completed_at.nullable is True
+
+
+def test_benchmark_result_tables_are_registered() -> None:
+    """
+    Verify case-result, quality-score, and performance tables are registered.
+    """
+
+    expected_table_names = {
+        "benchmark.benchmark_case_results",
+        "benchmark.benchmark_quality_scores",
+        "benchmark.benchmark_performance_metrics",
+    }
+
+    assert expected_table_names.issubset(BenchmarkBase.metadata.tables)
+
+
+def test_benchmark_case_result_references_run_and_case() -> None:
+    """
+    Verify every case result belongs to one run and one benchmark case.
+    """
+
+    expected_foreign_key_targets = {
+        "benchmark.benchmark_runs.benchmark_run_id",
+        "benchmark.benchmark_cases.benchmark_case_id",
+    }
+
+    actual_foreign_key_targets = {
+        foreign_key.target_fullname for foreign_key in BenchmarkCaseResult.__table__.foreign_keys
+    }
+
+    assert actual_foreign_key_targets == expected_foreign_key_targets
+
+
+def test_benchmark_case_result_run_case_pair_is_unique() -> None:
+    """
+    Verify version 1 stores at most one result for each run/case pair.
+    """
+
+    unique_constraints = {
+        constraint.name
+        for constraint in BenchmarkCaseResult.__table__.constraints
+        if constraint.__class__.__name__ == "UniqueConstraint"
+    }
+
+    assert "uq_benchmark_case_results_run_case" in unique_constraints
+
+
+def test_benchmark_case_result_required_fields_are_not_nullable() -> None:
+    """
+    Verify case results require their identity and execution status.
+    """
+
+    assert BenchmarkCaseResult.__table__.c.benchmark_run_id.nullable is False
+    assert BenchmarkCaseResult.__table__.c.benchmark_case_id.nullable is False
+    assert BenchmarkCaseResult.__table__.c.result_status.nullable is False
+
+
+def test_benchmark_quality_score_references_case_result() -> None:
+    """
+    Verify detailed quality scores belong to a benchmark case result.
+    """
+
+    foreign_key = next(
+        iter(BenchmarkQualityScore.__table__.c.benchmark_case_result_id.foreign_keys)
+    )
+
+    assert (
+        foreign_key.target_fullname == "benchmark.benchmark_case_results.benchmark_case_result_id"
+    )
+
+
+def test_performance_metric_uses_case_result_as_primary_and_foreign_key() -> None:
+    """
+    Verify performance telemetry is one-to-zero-or-one with a case result.
+    """
+
+    primary_key_columns = {
+        column.name for column in BenchmarkPerformanceMetric.__table__.primary_key.columns
+    }
+
+    assert primary_key_columns == {"benchmark_case_result_id"}
+
+    foreign_key = next(
+        iter(BenchmarkPerformanceMetric.__table__.c.benchmark_case_result_id.foreign_keys)
+    )
+
+    assert (
+        foreign_key.target_fullname == "benchmark.benchmark_case_results.benchmark_case_result_id"
+    )
+
+
+def test_result_flexible_metadata_uses_jsonb() -> None:
+    """
+    Verify scorer and backend-specific metadata use PostgreSQL JSONB.
+    """
+
+    quality_details_type = BenchmarkQualityScore.__table__.c.details.type
+    backend_metrics_type = BenchmarkPerformanceMetric.__table__.c.backend_metrics.type
+
+    assert quality_details_type.__class__.__name__ == "JSONB"
+    assert backend_metrics_type.__class__.__name__ == "JSONB"
+
+
+def test_historical_result_foreign_keys_restrict_parent_deletion() -> None:
+    """
+    Verify benchmark evidence cannot disappear through parent deletion.
+    """
+
+    historical_tables = (
+        BenchmarkCaseResult.__table__,
+        BenchmarkQualityScore.__table__,
+        BenchmarkPerformanceMetric.__table__,
+    )
+
+    for database_table in historical_tables:
+        for foreign_key in database_table.foreign_keys:
+            assert foreign_key.ondelete == "RESTRICT"
+
+
+def test_benchmark_reference_result_table_is_registered() -> None:
+    """
+    Verify externally published benchmark results have dedicated storage.
+    """
+
+    assert "benchmark.benchmark_reference_results" in BenchmarkBase.metadata.tables
+
+
+def test_benchmark_reference_result_foreign_keys_are_correct() -> None:
+    """
+    Verify external results identify both benchmark and model variant.
+    """
+
+    expected_foreign_key_targets = {
+        "benchmark.benchmark_definitions.benchmark_definition_id",
+        "benchmark.model_variants.model_variant_id",
+    }
+
+    actual_foreign_key_targets = {
+        foreign_key.target_fullname
+        for foreign_key in BenchmarkReferenceResult.__table__.foreign_keys
+    }
+
+    assert actual_foreign_key_targets == expected_foreign_key_targets
+
+
+def test_benchmark_reference_result_requires_provenance_and_score() -> None:
+    """
+    Verify an external score cannot exist without basic provenance.
+    """
+
+    assert BenchmarkReferenceResult.__table__.c.benchmark_definition_id.nullable is False
+    assert BenchmarkReferenceResult.__table__.c.model_variant_id.nullable is False
+    assert BenchmarkReferenceResult.__table__.c.source_name.nullable is False
+    assert BenchmarkReferenceResult.__table__.c.metric_name.nullable is False
+    assert BenchmarkReferenceResult.__table__.c.score_value.nullable is False
+
+
+def test_benchmark_reference_result_metadata_uses_jsonb() -> None:
+    """
+    Verify source-specific external benchmark metadata uses PostgreSQL JSONB.
+    """
+
+    source_metadata_type = BenchmarkReferenceResult.__table__.c.source_metadata.type
+
+    assert source_metadata_type.__class__.__name__ == "JSONB"
+
+
+def test_benchmark_reference_result_protects_historical_parents() -> None:
+    """
+    Verify reference-result provenance cannot be damaged by parent deletion.
+    """
+
+    for foreign_key in BenchmarkReferenceResult.__table__.foreign_keys:
+        assert foreign_key.ondelete == "RESTRICT"
+
+
+def test_reference_results_are_separate_from_local_runs() -> None:
+    """
+    Verify published scores are not incorrectly attached to local runs.
+    """
+
+    assert "benchmark_run_id" not in BenchmarkReferenceResult.__table__.c
+    assert "benchmark_case_result_id" not in BenchmarkReferenceResult.__table__.c
+
+
+def test_all_benchmark_orm_relationships_configure_successfully() -> None:
+    """
+    Verify SQLAlchemy can fully configure every benchmark ORM mapper.
+
+    Metadata-only tests can confirm tables, columns, and foreign keys without
+    fully validating relationship ``back_populates`` pairs.
+
+    Explicit mapper configuration catches missing or mismatched relationship
+    properties before application or seed code attempts a database query.
+    """
+
+    configure_mappers()

@@ -22,10 +22,14 @@ from sqlalchemy import Connection
 from local_ai_router.persistence.benchmark.base import BenchmarkBase
 from local_ai_router.persistence.benchmark.models import (
     BenchmarkCase,
+    BenchmarkCaseResult,
     BenchmarkCaseTag,
     BenchmarkCategory,
     BenchmarkDefinition,
     BenchmarkModel,
+    BenchmarkPerformanceMetric,
+    BenchmarkQualityScore,
+    BenchmarkReferenceResult,
     BenchmarkRun,
     BenchmarkSuite,
     BenchmarkSuiteCase,
@@ -56,6 +60,10 @@ if alembic_config.config_file_name is not None:
 # BenchmarkBase.metadata. Keeping this tuple also makes the registration
 # dependency explicit for readers and static-analysis tools.
 BENCHMARK_MODEL_TYPES = (
+    BenchmarkReferenceResult,
+    BenchmarkCaseResult,
+    BenchmarkPerformanceMetric,
+    BenchmarkQualityScore,
     BenchmarkRun,
     HardwareProfile,
     RuntimeProfile,

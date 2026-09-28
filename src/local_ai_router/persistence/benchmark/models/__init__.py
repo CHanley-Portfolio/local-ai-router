@@ -6,10 +6,14 @@ BenchmarkBase.metadata.
 """
 
 from .benchmark_case import BenchmarkCase
+from .benchmark_case_result import BenchmarkCaseResult
 from .benchmark_case_tag import BenchmarkCaseTag
 from .benchmark_category import BenchmarkCategory
 from .benchmark_definition import BenchmarkDefinition
 from .benchmark_model import BenchmarkModel
+from .benchmark_performance_metric import BenchmarkPerformanceMetric
+from .benchmark_quality_score import BenchmarkQualityScore
+from .benchmark_reference_result import BenchmarkReferenceResult
 from .benchmark_run import BenchmarkRun
 from .benchmark_suite import BenchmarkSuite
 from .benchmark_suite_case import BenchmarkSuiteCase
@@ -22,6 +26,10 @@ from .quantization import Quantization
 from .runtime_profile import RuntimeProfile
 
 __all__ = [
+    "BenchmarkReferenceResult",
+    "BenchmarkCaseResult",
+    "BenchmarkPerformanceMetric",
+    "BenchmarkQualityScore",
     "BenchmarkRun",
     "ContextProfile",
     "HardwareProfile",

@@ -23,6 +23,9 @@ if TYPE_CHECKING:
     from local_ai_router.persistence.benchmark.models.benchmark_case import (
         BenchmarkCase,
     )
+    from local_ai_router.persistence.benchmark.models.benchmark_reference_result import (
+        BenchmarkReferenceResult,
+    )
 
 
 class BenchmarkDefinition(BenchmarkBase):
@@ -91,5 +94,9 @@ class BenchmarkDefinition(BenchmarkBase):
     )
 
     benchmark_cases: Mapped[list["BenchmarkCase"]] = relationship(
+        back_populates="benchmark_definition",
+    )
+
+    benchmark_reference_results: Mapped[list["BenchmarkReferenceResult"]] = relationship(
         back_populates="benchmark_definition",
     )

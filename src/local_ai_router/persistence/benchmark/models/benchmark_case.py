@@ -28,6 +28,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from local_ai_router.persistence.benchmark.base import BenchmarkBase
 
 if TYPE_CHECKING:
+    from local_ai_router.persistence.benchmark.models.benchmark_case_result import (
+        BenchmarkCaseResult,
+    )
     from local_ai_router.persistence.benchmark.models.benchmark_case_tag import (
         BenchmarkCaseTag,
     )
@@ -163,5 +166,9 @@ class BenchmarkCase(BenchmarkBase):
     )
 
     benchmark_suite_cases: Mapped[list["BenchmarkSuiteCase"]] = relationship(
+        back_populates="benchmark_case",
+    )
+
+    benchmark_case_results: Mapped[list["BenchmarkCaseResult"]] = relationship(
         back_populates="benchmark_case",
     )
