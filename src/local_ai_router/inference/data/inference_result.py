@@ -1,9 +1,9 @@
 """
 Backend-independent inference result data.
 
-Inference backend expose different response formats.
-InferenceResult provides teh stable representation used by the Local AI Router, benchmark runner,
-API and persistence layers.
+Inference backends expose different response formats.
+InferenceResult provides the stable representation used by the Local AI Router
+API and routing layers.
 """
 
 from dataclasses import dataclass
@@ -16,15 +16,15 @@ class InferenceResult:
     Represent one complete model inference operation.
 
     Timing values are stored in nanoseconds because Ollama reports its native
-    timing metrics in nanoseconds and retaining the original precision avoids
-    lossy conversions before benchmark persistence.
+    timing metrics in nanoseconds, and retaining the original precision avoids
+    unnecessary early conversion.
 
     Attributes:
         model_name:
             Model reported by the inference backend.
 
         response_text:
-            Final tetual model response.
+            Final textual model response.
 
         total_duration_ns:
             Complete backend request duration when available.
