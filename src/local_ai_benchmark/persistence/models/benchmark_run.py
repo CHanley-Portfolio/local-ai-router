@@ -104,7 +104,7 @@ class BenchmarkRun(BenchmarkBase):
         nullable=True,
     )
 
-    router_git_commit: Mapped[str | None] = mapped_column(
+    source_git_commit: Mapped[str | None] = mapped_column(
         String(64),
         nullable=True,
     )
