@@ -17,9 +17,8 @@ class OllamaClient:
             base_url:
                 Base HTTP URL of the Ollama service.
 
-                Service-specific configuration remains outside this shared
-                inference package. The router, benchmark service, or another
-                caller supplies the appropriate endpoint.
+                Backend-specific configuration remains outside this adapter.
+                The router supplies the appropriate Ollama endpoint.
         """
 
         self._client = httpx.AsyncClient(
