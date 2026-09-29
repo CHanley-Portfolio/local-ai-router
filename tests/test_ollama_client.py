@@ -11,7 +11,7 @@ from decimal import Decimal
 
 import httpx
 
-from local_ai_inference import InferenceRequest, OllamaClient
+from local_ai_router.inference import InferenceRequest, OllamaClient
 
 
 def test_ollama_client_translates_inference_request() -> None:

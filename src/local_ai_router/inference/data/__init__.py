@@ -1,5 +1,5 @@
 """
-Shared inference data contracts used across Local AI Platform services.
+Backend-independent inference data contracts for the Local AI Router.
 """
 
 from .inference_request import InferenceRequest as InferenceRequest

@@ -26,7 +26,7 @@ The Application deliberatly keps routing policy and Ollama communication in sepe
     routing.py
         Routing decisions
 
-    ollama_client.py
+    inference/ollama_client.py
         Communication with Ollama
 
     schemas.py
@@ -41,7 +41,7 @@ from contextlib import asynccontextmanager
 import httpx
 from fastapi import FastAPI, HTTPException, Request
 
-from local_ai_inference import InferenceRequest, OllamaClient
+from .inference import InferenceRequest, OllamaClient
 
 from .config import DEFAULT_MODEL, OLLAMA_BASE_URL
 from .routing import choose_route

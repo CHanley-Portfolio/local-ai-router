@@ -33,7 +33,7 @@ import httpx
 import pytest
 from fastapi.testclient import TestClient
 
-from local_ai_inference import InferenceRequest, InferenceResult, OllamaClient
+from local_ai_router.inference import InferenceRequest, InferenceResult, OllamaClient
 from local_ai_router.config import DEFAULT_MODEL
 from local_ai_router.main import app
 

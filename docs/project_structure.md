@@ -27,18 +27,18 @@ local-ai-router/
 │   ├── routing_policy_v1.md
 │   └── testing_and_ci.md
 ├── src/
-│   ├── local_ai_inference/
-│   │   ├── __init__.py
-│   │   ├── ollama_client.py
-│   │   └── data/
-│   │       ├── __init__.py
-│   │       ├── inference_request.py
-│   │       └── inference_result.py
 │   └── local_ai_router/
 │       ├── __init__.py
 │       ├── config.py
 │       ├── main.py
 │       ├── schemas.py
+│       ├── inference/
+│       │   ├── __init__.py
+│       │   ├── ollama_client.py
+│       │   └── data/
+│       │       ├── __init__.py
+│       │       ├── inference_request.py
+│       │       └── inference_result.py
 │       └── routing/
 │           ├── __init__.py
 │           ├── router.py
@@ -60,10 +60,10 @@ local-ai-router/
 └── requirements-dev.lock.txt
 ```
 
-The temporary top-level `local_ai_inference` package remains part of the router
-repository for this checkpoint. It will be folded back under
-`local_ai_router/inference` in a follow-up cleanup so the repository has one
-clear runtime package.
+Inference contracts and backend adapters now live under
+`local_ai_router/inference`. The router repository therefore exposes one
+coherent runtime package and does not require a separate shared-inference
+package.
 
 ## HTTP/API layer
 

@@ -11,7 +11,6 @@ from pathlib import Path
 
 ROUTER_SOURCE_ROOTS = (
     Path(__file__).resolve().parents[1] / "src" / "local_ai_router",
-    Path(__file__).resolve().parents[1] / "src" / "local_ai_inference",
 )
 
 FORBIDDEN_IMPORT_ROOTS = {

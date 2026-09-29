@@ -7,12 +7,12 @@ from decimal import Decimal
 
 import pytest
 
-from local_ai_inference import InferenceRequest, InferenceResult
+from local_ai_router.inference import InferenceRequest, InferenceResult
 
 
 def test_inference_request_uses_explicit_application_fields() -> None:
     """
-    Verify benchmark-relevant generation settings have stable field names.
+    Verify normalized generation settings have stable field names.
     """
 
     inference_request = InferenceRequest(
@@ -36,7 +36,7 @@ def test_inference_request_uses_explicit_application_fields() -> None:
 
 def test_inference_request_optional_generation_settings_default_to_none() -> None:
     """
-    Verify normal chat requests do not require benchmark configuration.
+    Verify normal chat requests do not require optional generation configuration.
     """
 
     inference_request = InferenceRequest(
@@ -52,9 +52,9 @@ def test_inference_request_optional_generation_settings_default_to_none() -> Non
     assert inference_request.backend_options is None
 
 
-def test_inference_result_preserves_benchmark_metrics() -> None:
+def test_inference_result_preserves_performance_metrics() -> None:
     """
-    Verify normalized results can carry benchmark performance telemetry.
+    Verify normalized results preserve available inference performance telemetry.
     """
 
     inference_result = InferenceResult(
@@ -78,7 +78,7 @@ def test_inference_result_preserves_benchmark_metrics() -> None:
 
 def test_inference_request_is_immutable() -> None:
     """
-    Verify a request cannot change after benchmark execution begins.
+    Verify an inference request cannot change after construction.
     """
 
     inference_request = InferenceRequest(
