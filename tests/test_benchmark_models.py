@@ -615,3 +615,15 @@ def test_all_benchmark_orm_relationships_configure_successfully() -> None:
     """
 
     configure_mappers()
+
+def test_benchmark_run_uses_service_neutral_source_commit_field() -> None:
+    """
+    Verify benchmark provenance is not coupled to the runtime router.
+
+    Benchmark runs may originate from the Benchmark Service, scheduled jobs,
+    model-evaluation workflows, or other callers. The stored Git revision
+    therefore uses service-neutral terminology.
+    """
+
+    assert "source_git_commit" in BenchmarkRun.__table__.c
+    assert "router_git_commit" not in BenchmarkRun.__table__.c
