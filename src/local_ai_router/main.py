@@ -41,9 +41,8 @@ from contextlib import asynccontextmanager
 import httpx
 from fastapi import FastAPI, HTTPException, Request
 
-from .inference import InferenceRequest, OllamaClient
-
 from .config import DEFAULT_MODEL, OLLAMA_BASE_URL
+from .inference import InferenceRequest, OllamaClient
 from .routing import choose_route
 from .schemas import ChatRequest, ChatResponse, RouteRequest, RouteResponse
 
