@@ -19,8 +19,12 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import Connection
 
-from local_ai_router.persistence.benchmark.base import BenchmarkBase
-from local_ai_router.persistence.benchmark.models import (
+from local_ai_benchmark.persistence.base import BenchmarkBase
+from local_ai_benchmark.persistence.database import (
+    build_database_url,
+    create_database_engine,
+)
+from local_ai_benchmark.persistence.models import (
     BenchmarkCase,
     BenchmarkCaseResult,
     BenchmarkCaseTag,
@@ -40,10 +44,6 @@ from local_ai_router.persistence.benchmark.models import (
     ModelVariant,
     Quantization,
     RuntimeProfile,
-)
-from local_ai_router.persistence.database import (
-    build_database_url,
-    create_database_engine,
 )
 
 # Alembic provides this configuration object when a migration command runs.

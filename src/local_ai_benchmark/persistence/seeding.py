@@ -14,8 +14,12 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from local_ai_router.config import get_database_settings
-from local_ai_router.persistence.benchmark.models import (
+from local_ai_benchmark.config import get_benchmark_database_settings
+from local_ai_benchmark.persistence.database import (
+    create_database_engine,
+    create_database_session_factory,
+)
+from local_ai_benchmark.persistence.models import (
     BenchmarkCase,
     BenchmarkCategory,
     BenchmarkDefinition,
@@ -28,10 +32,6 @@ from local_ai_router.persistence.benchmark.models import (
     ModelVariant,
     Quantization,
     RuntimeProfile,
-)
-from local_ai_router.persistence.database import (
-    create_database_engine,
-    create_database_session_factory,
 )
 
 
@@ -329,12 +329,12 @@ def seed_benchmark_test_database() -> BenchmarkSeedIds:
             If the configured database is not 'local_ai_router_test'.
     """
 
-    databse_settings = get_database_settings()
+    database_settings = get_benchmark_database_settings()
 
-    if databse_settings.database_name != "local_ai_router_test":
+    if database_settings.database_name != "local_ai_router_test":
         raise RuntimeError("Benchmark test seed may only run against 'local_ai_router_test'.")
 
-    database_engine = create_database_engine(databse_settings)
+    database_engine = create_database_engine(database_settings)
     database_session_factory = create_database_session_factory(database_engine)
 
     try:

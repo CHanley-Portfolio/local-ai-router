@@ -26,13 +26,13 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from local_ai_router.persistence.benchmark.base import BenchmarkBase
+from local_ai_benchmark.persistence.base import BenchmarkBase
 
 if TYPE_CHECKING:
-    from local_ai_router.persistence.benchmark.models.benchmark_definition import (
+    from local_ai_benchmark.persistence.models.benchmark_definition import (
         BenchmarkDefinition,
     )
-    from local_ai_router.persistence.benchmark.models.model_variant import (
+    from local_ai_benchmark.persistence.models.model_variant import (
         ModelVariant,
     )
 

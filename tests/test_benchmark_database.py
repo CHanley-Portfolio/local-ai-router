@@ -8,8 +8,8 @@ integration concern.
 
 import pytest
 
-from local_ai_router.config import DatabaseSettings, get_database_settings
-from local_ai_router.persistence.database import build_database_url
+from local_ai_benchmark.config import BenchmarkDatabaseSettings, get_benchmark_database_settings
+from local_ai_benchmark.persistence.database import build_database_url
 
 
 def test_database_settings_use_expected_local_defaults(monkeypatch) -> None:
@@ -18,28 +18,28 @@ def test_database_settings_use_expected_local_defaults(monkeypatch) -> None:
     """
 
     monkeypatch.setenv(
-        "LOCAL_AI_ROUTER_DB_PASSWORD",
+        "LOCAL_AI_BENCHMARK_DB_PASSWORD",
         "test-password",
     )
 
     monkeypatch.delenv(
-        "LOCAL_AI_ROUTER_DB_HOST",
+        "LOCAL_AI_BENCHMARK_DB_HOST",
         raising=False,
     )
     monkeypatch.delenv(
-        "LOCAL_AI_ROUTER_DB_PORT",
+        "LOCAL_AI_BENCHMARK_DB_PORT",
         raising=False,
     )
     monkeypatch.delenv(
-        "LOCAL_AI_ROUTER_DB_NAME",
+        "LOCAL_AI_BENCHMARK_DB_NAME",
         raising=False,
     )
     monkeypatch.delenv(
-        "LOCAL_AI_ROUTER_DB_USER",
+        "LOCAL_AI_BENCHMARK_DB_USER",
         raising=False,
     )
 
-    database_settings = get_database_settings()
+    database_settings = get_benchmark_database_settings()
 
     assert database_settings.host == "127.0.0.1"
     assert database_settings.port == 5432
@@ -54,15 +54,15 @@ def test_database_password_is_required(monkeypatch) -> None:
     """
 
     monkeypatch.delenv(
-        "LOCAL_AI_ROUTER_DB_PASSWORD",
+        "LOCAL_AI_BENCHMARK_DB_PASSWORD",
         raising=False,
     )
 
     with pytest.raises(
         RuntimeError,
-        match="LOCAL_AI_ROUTER_DB_PASSWORD",
+        match="LOCAL_AI_BENCHMARK_DB_PASSWORD",
     ):
-        get_database_settings()
+        get_benchmark_database_settings()
 
 
 def test_database_url_uses_psycopg_driver() -> None:
@@ -70,7 +70,7 @@ def test_database_url_uses_psycopg_driver() -> None:
     Verify SQLAlchemy uses PostgreSQL through the Psycopg 3 driver.
     """
 
-    database_settings = DatabaseSettings(
+    database_settings = BenchmarkDatabaseSettings(
         host="127.0.0.1",
         port=5432,
         database_name="local_ai_router",

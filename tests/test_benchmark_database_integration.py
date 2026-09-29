@@ -19,17 +19,17 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from local_ai_router.config import get_database_settings
-from local_ai_router.persistence.benchmark.models import (
+from local_ai_benchmark.config import get_benchmark_database_settings
+from local_ai_benchmark.persistence.database import create_database_engine
+from local_ai_benchmark.persistence.models import (
     BenchmarkCaseResult,
     BenchmarkPerformanceMetric,
     BenchmarkQualityScore,
     BenchmarkRun,
 )
-from local_ai_router.persistence.benchmark.seeding import (
+from local_ai_benchmark.persistence.seeding import (
     seed_benchmark_test_data,
 )
-from local_ai_router.persistence.database import create_database_engine
 
 
 @pytest.fixture
@@ -47,10 +47,10 @@ def benchmark_database_session() -> Generator[Session, None, None]:
     test finishes.
     """
 
-    if not os.getenv("LOCAL_AI_ROUTER_DB_PASSWORD"):
-        pytest.skip("PostgreSQL integration test requires LOCAL_AI_ROUTER_DB_PASSWORD.")
+    if not os.getenv("LOCAL_AI_BENCHMARK_DB_PASSWORD"):
+        pytest.skip("PostgreSQL integration test requires LOCAL_AI_BENCHMARK_DB_PASSWORD.")
 
-    database_settings = get_database_settings()
+    database_settings = get_benchmark_database_settings()
 
     if database_settings.database_name != "local_ai_router_test":
         pytest.skip(

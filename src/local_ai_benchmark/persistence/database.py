@@ -11,10 +11,10 @@ PostgreSQL connection details, or SQLAlchemy engine configuration.
 from sqlalchemy import URL, Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from local_ai_router.config import DatabaseSettings, get_database_settings
+from local_ai_benchmark.config import BenchmarkDatabaseSettings, get_benchmark_database_settings
 
 
-def build_database_url(database_settings: DatabaseSettings | None = None) -> URL:
+def build_database_url(database_settings: BenchmarkDatabaseSettings | None = None) -> URL:
     """
     Build a SQLAlchemy PostgreSQL connection URL.
 
@@ -31,7 +31,7 @@ def build_database_url(database_settings: DatabaseSettings | None = None) -> URL
     """
 
     if database_settings is None:
-        database_settings = get_database_settings()
+        database_settings = get_benchmark_database_settings()
 
     return URL.create(
         drivername="postgresql+psycopg",
@@ -43,7 +43,7 @@ def build_database_url(database_settings: DatabaseSettings | None = None) -> URL
     )
 
 
-def create_database_engine(database_settings: DatabaseSettings | None = None) -> Engine:
+def create_database_engine(database_settings: BenchmarkDatabaseSettings | None = None) -> Engine:
     """
     Create the application's SqLAlchemy database engine.
 

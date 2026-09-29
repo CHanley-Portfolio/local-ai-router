@@ -10,10 +10,10 @@ from typing import TYPE_CHECKING
 from sqlalchemy import BigInteger, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from local_ai_router.persistence.benchmark.base import BenchmarkBase
+from local_ai_benchmark.persistence.base import BenchmarkBase
 
 if TYPE_CHECKING:
-    from local_ai_router.persistence.benchmark.models.benchmark_case import (
+    from local_ai_benchmark.persistence.models.benchmark_case import (
         BenchmarkCase,
     )
 

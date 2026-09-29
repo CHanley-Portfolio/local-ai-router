@@ -20,17 +20,17 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from local_ai_router.persistence.benchmark.base import BenchmarkBase
+from local_ai_benchmark.persistence.base import BenchmarkBase
 
 if TYPE_CHECKING:
-    from local_ai_router.persistence.benchmark.models.benchmark_model import (
+    from local_ai_benchmark.persistence.models.benchmark_model import (
         BenchmarkModel,
     )
-    from local_ai_router.persistence.benchmark.models.benchmark_reference_result import (
+    from local_ai_benchmark.persistence.models.benchmark_reference_result import (
         BenchmarkReferenceResult,
     )
-    from local_ai_router.persistence.benchmark.models.model_profile import ModelProfile
-    from local_ai_router.persistence.benchmark.models.quantization import Quantization
+    from local_ai_benchmark.persistence.models.model_profile import ModelProfile
+    from local_ai_benchmark.persistence.models.quantization import Quantization
 
 
 class ModelVariant(BenchmarkBase):

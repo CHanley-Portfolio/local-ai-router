@@ -16,25 +16,25 @@ from typing import TYPE_CHECKING
 from sqlalchemy import BigInteger, DateTime, ForeignKey, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from local_ai_router.persistence.benchmark.base import BenchmarkBase
+from local_ai_benchmark.persistence.base import BenchmarkBase
 
 if TYPE_CHECKING:
-    from local_ai_router.persistence.benchmark.models.benchmark_case_result import (
+    from local_ai_benchmark.persistence.models.benchmark_case_result import (
         BenchmarkCaseResult,
     )
-    from local_ai_router.persistence.benchmark.models.benchmark_suite import (
+    from local_ai_benchmark.persistence.models.benchmark_suite import (
         BenchmarkSuite,
     )
-    from local_ai_router.persistence.benchmark.models.context_profile import (
+    from local_ai_benchmark.persistence.models.context_profile import (
         ContextProfile,
     )
-    from local_ai_router.persistence.benchmark.models.hardware_profile import (
+    from local_ai_benchmark.persistence.models.hardware_profile import (
         HardwareProfile,
     )
-    from local_ai_router.persistence.benchmark.models.model_profile import (
+    from local_ai_benchmark.persistence.models.model_profile import (
         ModelProfile,
     )
-    from local_ai_router.persistence.benchmark.models.runtime_profile import (
+    from local_ai_benchmark.persistence.models.runtime_profile import (
         RuntimeProfile,
     )
 

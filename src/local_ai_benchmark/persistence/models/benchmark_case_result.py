@@ -24,19 +24,19 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from local_ai_router.persistence.benchmark.base import BenchmarkBase
+from local_ai_benchmark.persistence.base import BenchmarkBase
 
 if TYPE_CHECKING:
-    from local_ai_router.persistence.benchmark.models.benchmark_case import (
+    from local_ai_benchmark.persistence.models.benchmark_case import (
         BenchmarkCase,
     )
-    from local_ai_router.persistence.benchmark.models.benchmark_performance_metric import (
+    from local_ai_benchmark.persistence.models.benchmark_performance_metric import (
         BenchmarkPerformanceMetric,
     )
-    from local_ai_router.persistence.benchmark.models.benchmark_quality_score import (
+    from local_ai_benchmark.persistence.models.benchmark_quality_score import (
         BenchmarkQualityScore,
     )
-    from local_ai_router.persistence.benchmark.models.benchmark_run import (
+    from local_ai_benchmark.persistence.models.benchmark_run import (
         BenchmarkRun,
     )
 

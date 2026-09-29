@@ -8,8 +8,8 @@ separately.
 
 from sqlalchemy.orm import configure_mappers
 
-from local_ai_router.persistence.benchmark.base import BenchmarkBase
-from local_ai_router.persistence.benchmark.models import (
+from local_ai_benchmark.persistence.base import BenchmarkBase
+from local_ai_benchmark.persistence.models import (
     BenchmarkCase,
     BenchmarkCaseResult,
     BenchmarkCaseTag,

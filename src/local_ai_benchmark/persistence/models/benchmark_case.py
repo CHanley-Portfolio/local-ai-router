@@ -25,22 +25,22 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from local_ai_router.persistence.benchmark.base import BenchmarkBase
+from local_ai_benchmark.persistence.base import BenchmarkBase
 
 if TYPE_CHECKING:
-    from local_ai_router.persistence.benchmark.models.benchmark_case_result import (
+    from local_ai_benchmark.persistence.models.benchmark_case_result import (
         BenchmarkCaseResult,
     )
-    from local_ai_router.persistence.benchmark.models.benchmark_case_tag import (
+    from local_ai_benchmark.persistence.models.benchmark_case_tag import (
         BenchmarkCaseTag,
     )
-    from local_ai_router.persistence.benchmark.models.benchmark_category import (
+    from local_ai_benchmark.persistence.models.benchmark_category import (
         BenchmarkCategory,
     )
-    from local_ai_router.persistence.benchmark.models.benchmark_definition import (
+    from local_ai_benchmark.persistence.models.benchmark_definition import (
         BenchmarkDefinition,
     )
-    from local_ai_router.persistence.benchmark.models.benchmark_suite_case import (
+    from local_ai_benchmark.persistence.models.benchmark_suite_case import (
         BenchmarkSuiteCase,
     )
 

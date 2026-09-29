@@ -7,7 +7,7 @@ Alembic migrations will rely upon.
 
 from sqlalchemy import MetaData
 
-from local_ai_router.persistence.benchmark.base import (
+from local_ai_benchmark.persistence.base import (
     BENCHMARK_SCHEMA_NAME,
     BenchmarkBase,
 )
